@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
-
+        <meta charset="utf-8">
+        <title>Head mesh test</title>
     </head>
-
-    <body>
+    <body style="margin: 0;">
+        
         <script src="js/three.min.js"></script>
         <script src="js/OrbitControls.js"></script>
+        
         <script>
             // Set up the scene, camera, and renderer as global variables.
             var scene, camera, renderer;
-            init();
-            animate();
+
             // Sets up the scene.
             function init() {
                 // Create the scene and set the scene size.
@@ -43,7 +43,7 @@
                 });
 
                 // Set the background color of the scene.
-                renderer.setClearColorHex(0x333F47, 1);
+                renderer.setClearColor(0x333F47, 1);
 
                 // Create a light, set its position, and add it to the scene.
                 var light = new THREE.PointLight(0xffffff);
@@ -75,6 +75,9 @@
                 controls.update();
 
             }
+
+            init();
+            animate();
 
         </script>
     </body>
