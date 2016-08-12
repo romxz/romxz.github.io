@@ -1,4 +1,4 @@
-&lt;!doctype html&gt;
+<!DOCTYPE html>
 <script src="js/three.min.js"></script>
 <script src="js/OrbitControls.js"></script>
 <script>
@@ -45,7 +45,7 @@
 
         // Load in the mesh and add it to the scene.
         var loader = new THREE.JSONLoader();
-        loader.load( "models/head_mesh.js", function(geometry){
+        loader.load( "models/head_mesh.json", function(geometry){
             var material = new THREE.MeshLambertMaterial({color: 0xFAE7D0});
             mesh = new THREE.Mesh(geometry, material);
             scene.add(mesh);
