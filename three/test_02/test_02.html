@@ -52,8 +52,6 @@
 
                 // Load in the mesh and add it to the scene.
                 var loader = new THREE.JSONLoader();
-                //head_mesh.json
-                //treehouse_logo.js
                 loader.load( "models/head_mesh.json", function(geometry){
                     var material = new THREE.MeshLambertMaterial({color: 0xFAE7D0});
                     mesh = new THREE.Mesh(geometry, material);
