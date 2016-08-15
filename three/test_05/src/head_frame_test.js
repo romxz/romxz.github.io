@@ -51,7 +51,7 @@ function fillScene() {
     }
 
     // rig material
-    var rigMaterial = new THREE.MeshPhongMaterial( { color: 0x0F0FFD, specular: 0x20858D, shininess: 50 } );
+    var rigMaterial = new THREE.MeshPhongMaterial( { color: 0x0F0FFD, specular: 0xFFFFFF, shininess: 30 } );
 
     rig4 = new THREE.Object3D();
     rig4.length = 80;
@@ -107,9 +107,10 @@ function createRig(part, length, material){
     rigGeometry.faces.push(new THREE.Face3(3,1,5));
     rigGeometry.faces.push(new THREE.Face3(2,3,5));
     rigGeometry.faces.push(new THREE.Face3(0,2,5));
+    rigGeometry.computeFaceNormals();
     var rigObject = new THREE.Mesh(rigGeometry, material);
     rigObject.position.y = length*0.25;
-
+    
     part.add(rigObject);
 }
 
