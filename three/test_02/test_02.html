@@ -30,7 +30,9 @@
 
                 // Create a camera, zoom it out from the model a bit, and add it to the scene.
                 camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 20000);
-                camera.position.set(-6, 3, 5);
+                camera.position.set(0.8, 0, 2);
+                //camera.lookAt(V3(0,3,0));
+                //camera.up = V3(0,1,0);
                 scene.add(camera);
 
                 // Create an event listener that resizes the renderer with the browser window.
@@ -43,7 +45,7 @@
                 });
 
                 // Set the background color of the scene.
-                renderer.setClearColor(0x333F47, 1);
+                renderer.setClearColor(0x038387, 1.5);
 
                 // Create a light, set its position, and add it to the scene.
                 var light = new THREE.PointLight(0xffffff);
@@ -55,9 +57,11 @@
                 loader.load( "models/woman_bust.json", function(geometry){
                     var material = new THREE.MeshLambertMaterial({color: 0xFAE7D0});
                     mesh = new THREE.Mesh(geometry, material);
+                    //mesh = new THREE.Mesh(geometry);
+                    mesh.position.y = -1.4;
                     scene.add(mesh);
                 });
-
+                
                 // Add OrbitControls so that we can pan around with the mouse.
                 controls = new THREE.OrbitControls(camera, renderer.domElement);
             }
@@ -73,7 +77,10 @@
                 controls.update();
 
             }
-
+            
+            function V3(x, y, z){
+                return new THREE.Vector3(x,y,z);
+            }
             init();
             animate();
 
