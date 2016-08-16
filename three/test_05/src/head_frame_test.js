@@ -51,7 +51,7 @@ function fillScene() {
     }
 
     // rig material
-    var rigMaterial = new THREE.MeshPhongMaterial( { color: 0x0F0FFD, specular: 0xFFFFFF, shininess: 30 } );
+    var rigMaterial = new THREE.MeshPhongMaterial( { color: 0x0F0FFD, specular: 0xFFFFFF, shininess: 30} );
 
     rig4 = new THREE.Object3D();
     rig4.length = 80;
@@ -123,7 +123,7 @@ function init() {
     renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
-    renderer.setSize(canvasWidth, canvasHeight);
+    renderer.setSize(canvasWidth/2, canvasHeight/2);
     renderer.setClearColorHex( 0xAAAAAA, 1.0 );
 
     var container = document.getElementById('container');
