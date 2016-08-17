@@ -51,16 +51,27 @@
                 var light = new THREE.PointLight(0xffffff);
                 light.position.set(-100,200,100);
                 scene.add(light);
+                
+                //var light2 = new THREE.AmbientLight(0xffffff, 0.1);
+                //scene.add(light2);
 
                 // Load in the mesh and add it to the scene.
                 var loader = new THREE.JSONLoader();
+                loader.load( "models/woman_bust.json", function(geometry, materials){
+                    //var material = new THREE.MeshLambertMaterial({color: 0xFAE7D0});
+                    mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: 0xFAE7D0}, materials));
+                    //mesh = new THREE.Mesh(geometry);
+                    mesh.position.y = -1.4;
+                    scene.add(mesh);
+                });
+                /*
                 loader.load( "models/woman_bust.json", function(geometry){
                     var material = new THREE.MeshLambertMaterial({color: 0xFAE7D0});
                     mesh = new THREE.Mesh(geometry, material);
                     //mesh = new THREE.Mesh(geometry);
                     mesh.position.y = -1.4;
                     scene.add(mesh);
-                });
+                });*/
                 
                 // Add OrbitControls so that we can pan around with the mouse.
                 controls = new THREE.OrbitControls(camera, renderer.domElement);
