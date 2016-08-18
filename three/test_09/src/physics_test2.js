@@ -212,11 +212,13 @@ function render() {
         tailObjects[1][tailIndex].position.copy(Carl.position);
         tailIndex += 1;
         tailIndex = tailIndex % tailSegments;
-        
+
         // Pulsating update
         var velNormal = Carl.velocity.clone();
-        velNormal.normalize();
-        Carl.mesh.scale.set(1+0.3*velNormal.x*(1+Math.sin(2*Math.PI*time)), 1+0.3*velNormal.y*(1+Math.sin(3*Math.PI*time)), 1+0.3*velNormal.z*(1+Math.sin(5*Math.PI*time)));
+        if (velNormal.length > 1){
+            velNormal.normalize();    
+        }
+        Carl.mesh.scale.set(0.9+0.05*Math.abs(velNormal.x*Math.sin(0.5*Math.PI*time)), 0.9+0.05*Math.abs(velNormal.y*Math.sin(Math.PI*time+1)), 0.9+0.05*Math.abs(velNormal.z*Math.sin(0.3*Math.PI*time+3)));
     }
 }
 
