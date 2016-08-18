@@ -7,10 +7,14 @@ var camera, scene, renderer, cameraControls, effectController, gui;
 var clock = new THREE.Clock();
 var lights = [];
 var state = { restart: false };
-var Alice, Bob;
+var Alice, Bob, Eve;
+var aliceRad = 5, bobRad = 5, eveRad = 2;
 var mInit = 500;
-var kInit = 100;
-var bInit = 15;
+var kInit = 700;
+var bInit = 35;
+var c = 100;
+var maxDistance = 30;
+var eveFollowAlice = true;
 var VIEW_SCALE = 0.8;
 
 function init() {
@@ -36,7 +40,7 @@ function init() {
 
     // CAMERA
     camera = new THREE.PerspectiveCamera(30, canvasRatio, 1, 10000);
-    camera.position.set(-61, 34, 10);
+    camera.position.set(-100, 100, 100);
 
     // CONTROLS
     cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -51,38 +55,72 @@ function init() {
 
     // Alice
     Alice = new THREE.Object3D();
-    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( 5, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000} ));
+    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000} ));
     Alice.m = mInit;
     Alice.k = kInit;
     Alice.b = bInit;
     Alice.add(aliceSphere);
+    Alice.position.x = 1;
     Alice.velocity = V3(5,5,5);
     scene.add(Alice);
-    
+
     // Bob
     Bob = new THREE.Object3D();
-    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( 5, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff} ));
+    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff} ));
     Bob.m = mInit;
     Bob.k = kInit;
     Bob.b = bInit;
     Bob.add(bobSphere);
     Bob.velocity = V3(0,0,0);
     scene.add(Bob);
+
+    // Eve
+    Eve = new THREE.Object3D();
+    var eveSphere = new THREE.Mesh(new THREE.SphereGeometry( eveRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ff00} ));
+    Eve.m = mInit/10;
+    Eve.k = kInit*4;
+    Eve.b = bInit/3;
+    Eve.add(eveSphere);
+    Eve.velocity = V3(5,-10,3);
+    scene.add(Eve);
 }
 
 function render() {
     var delta = clock.getDelta();
+    delta = Math.min(delta, 1);
     //log(delta);
-    cameraControls.update(delta);
-    var time = Date.now()*0.001;
-    var currPos = updatePosition(Alice, Bob, delta);
-    var currVel = updateVelocity(Alice, Bob, delta);
-    Alice.position.x = currPos.x;
-    Alice.position.y = currPos.y;
-    Alice.position.z = currPos.z;
-    //log(Alice.position);
-    Alice.velocity = currVel;
-    //log(Alice.velocity);
+    if(delta <1){
+        cameraControls.update(delta);
+        //var time = Date.now()*0.001;
+        // Eve update
+        var eve2Alice = dist3(Eve.position, Alice.position);
+        var eve2Bob = dist3(Eve.position, Bob.position);
+        if (1.3*eve2Alice < eve2Bob){
+            eveFollowAlice = true;
+        } else {
+            eveFollowAlice = false;
+        }
+        var currPos, curVel;
+        if (eveFollowAlice == true){
+            currPos = updatePosition(Eve, Alice, delta);
+            currVel = updateVelocity(Eve, Alice, delta);
+        } else {
+            currPos = updatePosition(Eve, Bob, delta);
+            currVel = updateVelocity(Eve, Bob, delta);
+        }
+        log(eve2Alice < eve2Bob);
+        Eve.position.x = currPos.x;
+        Eve.position.y = currPos.y;
+        Eve.position.z = currPos.z;
+        Eve.velocity = currVel;
+        // Alice update
+        var currPos = updatePosition(Alice, Bob, delta);
+        var currVel = updateVelocity(Alice, Bob, delta);
+        Alice.position.x = currPos.x;
+        Alice.position.y = currPos.y;
+        Alice.position.z = currPos.z;
+        Alice.velocity = currVel;
+    }
 }
 
 function getC0(m, k, b, delta){ return (1-k*delta*delta/(2*m)); }
@@ -99,10 +137,20 @@ function updatePosition(p, q, delta){
     var c1 = getC1(p.m, p.k, p.b, delta);
     var c2 = getC2(p.m, p.k, p.b, delta);
     var c3 = getC3(p.m, p.k, p.b, delta);
-    var px = c0*p.position.x+c1*q.position.x+c2*p.velocity.x+c3*q.velocity.x;
-    var py = c0*p.position.y+c1*q.position.y+c2*p.velocity.y+c3*q.velocity.y;
-    var pz = c0*p.position.z+c1*q.position.z+c2*p.velocity.z+c3*q.velocity.z;
-    return V3(px, py, pz);
+    var ppx = p.position.x, ppy = p.position.y, ppz = p.position.z;
+    var qqx = q.position.x, qqy = q.position.y, qqz = q.position.z;
+    var px = c0*ppx+c1*qqx+c2*p.velocity.x+c3*q.velocity.x;
+    var py = c0*ppy+c1*qqy+c2*p.velocity.y+c3*q.velocity.y;
+    var pz = c0*ppz+c1*qqz+c2*p.velocity.z+c3*q.velocity.z;
+    var ppos = V3(px, py, pz);
+    var qpos = q.position.clone();
+    var disp = V3(0,0,0).subVectors(ppos, qpos);
+    var dist = disp.length;
+    if (dist > maxDistance){
+        disp.multiplyScalar(maxDistance/(dist+1));
+        ppos.addVectors(qpos, disp);
+    }
+    return ppos;
 }
 
 function updateVelocity(p, q, delta){
@@ -113,7 +161,13 @@ function updateVelocity(p, q, delta){
     var vx = c4*p.position.x+c5*q.position.x+c6*p.velocity.x+c7*q.velocity.x;
     var vy = c4*p.position.y+c5*q.position.y+c6*p.velocity.y+c7*q.velocity.y;
     var vz = c4*p.position.z+c5*q.position.z+c6*p.velocity.z+c7*q.velocity.z;
-    return V3(vx, vy, vz);
+    // limiting speed:
+    var vel = V3(vx,vy,vz);
+    var speed = vel.length();
+    if (speed > c){
+        vel.multiplyScalar(c/(speed+1));
+    }
+    return vel;
 }
 
 function animate() {
@@ -153,6 +207,11 @@ function V3(x,y,z){ return new THREE.Vector3(x,y,z);}
 function V4(x,y,z,w){ return new THREE.Vector4(x,y,z,w);}
 function F3(x,y,z){ return new THREE.Face3(x,y,z);}
 function log(check){ window.console.log(check);}
+function dist3(V3a, V3b){
+    var vx = V3a.x, vy = V3a.y, vz = V3a.z;
+    var ux = V3b.x, uy = V3b.y, uz = V3b.z;
+    return Math.sqrt((vx-ux)*(vx-ux)+(vy-uy)*(vy-uy)+(vz-uz)*(vz-uz));
+}
 
 if (true){
     try {
