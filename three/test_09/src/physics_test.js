@@ -61,7 +61,7 @@ function init() {
     Alice.k = kInit;
     Alice.b = bInit;
     Alice.add(aliceSphere);
-    Alice.position.x = 1;
+    Alice.position.x = aliceRad;
     Alice.velocity = V3(5,5,5);
     scene.add(Alice);
 

@@ -6,20 +6,21 @@
 var camera, scene, renderer, cameraControls, effectController, gui;
 var clock = new THREE.Clock();
 var lights = [];
-var state = { restart: false };
+//var state = { restart: false };
 var Alice, Bob, Carl, Eve;
 var aliceRad = 9, bobRad = 10, carlRad = 9.5, eveRad = 8.5;
-var mInit = 20;
-var kInit = 1400;
-var bInit = 0;
+var invisibleVolumeFactor = 0.2;
+var mInit = 500;
+var kInit = 700;
+var bInit = 15;
 var c = 100;
-var maxDistance = 30;
+var maxDistance = 200;
 var eveFollowAlice = true;
 var VIEW_SCALE = 0.8;
 var tailObjects = [[], []];
 var tailSegments = 30;
 var tailIndex = 0;
-var environment = {heat: 5};
+var environment = {heat: 1, strongDistance: bobRad*20, gravity: 1000};
 
 function init() {
     var canvasWidth = window.innerWidth;
@@ -33,7 +34,7 @@ function init() {
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
     renderer.setSize(VIEW_SCALE*canvasWidth, VIEW_SCALE*canvasHeight);
-    renderer.setClearColor(0xAAAAAA, 1.0);
+    renderer.setClearColor(0x111111, 1.0);
     var container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 
@@ -44,7 +45,7 @@ function init() {
 
     // CAMERA
     camera = new THREE.PerspectiveCamera(30, canvasRatio, 1, 10000);
-    camera.position.set(-100, 100, 100);
+    camera.position.set(-200, 200, 200);
 
     // CONTROLS
     cameraControls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -59,47 +60,51 @@ function init() {
 
     // Alice
     Alice = new THREE.Object3D();
-    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000, transparent: true, opacity: 0.8} ));
+    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000, transparent: true, opacity: 0.9} ));
     Alice.m = mInit;
     Alice.k = kInit;
     Alice.b = bInit;
+    Alice.rad = aliceRad;
     Alice.add(aliceSphere);
-    Alice.position.x = 1;
+    Alice.position.x = aliceRad;
     Alice.velocity = V3(5*aliceRad,5*aliceRad,5*aliceRad);
     scene.add(Alice);
 
     // Bob
     Bob = new THREE.Object3D();
     //MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.5});
-    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.8} ));
-    Bob.add(bobSphere);
+    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.5} ));
     Bob.m = mInit;
     Bob.k = kInit;
     Bob.b = bInit;
+    Bob.rad = bobRad;
+    Bob.add(bobSphere);
     Bob.velocity = V3(0,0,0);
     scene.add(Bob);
-    
+
     // Carl
     Carl = new THREE.Object3D();
     //MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.5});
-    var carlSphere = new THREE.Mesh(new THREE.SphereGeometry( carlRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff, transparent: true, opacity: 0.2} ));
+    var carlSphere = new THREE.Mesh(new THREE.SphereGeometry( carlRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff, transparent: true, opacity: 0.5} ));
     Carl.add(carlSphere);
     Carl.m = mInit/10;
     Carl.k = kInit*2;
     Carl.b = bInit*10;
+    Carl.rad = carlRad;
     Carl.velocity = V3(-carlRad,-carlRad,-carlRad);
     scene.add(Carl);
 
     // Eve
     Eve = new THREE.Object3D();
-    var eveSphere = new THREE.Mesh(new THREE.SphereGeometry( eveRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff00ff} ));
+    var eveSphere = new THREE.Mesh(new THREE.SphereGeometry( eveRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ff00, transparent: true, opacity: 0.7} ));
     Eve.m = mInit/10;
-    Eve.k = kInit*2;
+    Eve.k = kInit*4;
     Eve.b = bInit/3;
+    Eve.rad = eveRad;
     Eve.add(eveSphere);
     Eve.velocity = V3(50*eveRad,-20*eveRad,-15*eveRad);
     scene.add(Eve);
-    
+
     // Tails
     var tailObject;
     var tailSphere; 
@@ -110,8 +115,8 @@ function init() {
     for (var i = 0; i < tailSegments; i++){
         // hacky function for curvy radiuses
         tailRad = eveRad*Math.exp(-Math.pow(2*(i-tailSegments/2)/tailSegments,2));
-        tailColor.setRGB(1-i*0.5/tailSegments,i*0.5/tailSegments,1-i*0.5/tailSegments);
-        tailSphere = new THREE.Mesh(new THREE.SphereGeometry(tailRad, 32, 32), new THREE.MeshBasicMaterial({color:tailColor.getHex(), transparent: true, opacity: 0.2}));
+        tailColor.setRGB(0,1-i*0.5/tailSegments,i*0.5/tailSegments);
+        tailSphere = new THREE.Mesh(new THREE.SphereGeometry(tailRad, 32, 32), new THREE.MeshBasicMaterial({color:tailColor.getHex(), transparent: true, opacity: 0.6}));
         tailObject = new THREE.Object3D();
         tailObject.add(tailSphere);
         tailObject.position.copy(Eve.position);
@@ -137,50 +142,67 @@ function render() {
     var delta = clock.getDelta();
     delta = Math.min(delta, 1);
     //log(delta);
+    //var time = Date.now()*0.001;
+    // Bob's position
+    Bob.position.x = Bob.position.x + environment.heat*delta*(0.5-Math.random())/Bob.m;
+    Bob.position.y = Bob.position.y + environment.heat*delta*(0.5-Math.random())/Bob.m;
+    Bob.position.z = Bob.position.z + environment.heat*delta*(0.5-Math.random())/Bob.m;
+
     if(delta <1){
+        scene.rotation.x += .1*delta;
+        scene.rotation.y += .05*delta;
+        scene.rotation.z += .025*delta;
         cameraControls.update(delta);
         //var time = Date.now()*0.001;
-        
-        // Position updates
+
+        // Update state variables
         var currPos, currVel;
-        
-        // Eve update
-        var eve2Alice = dist3(Eve.position, Alice.position);
-        var eve2Bob = dist3(Eve.position, Bob.position);
-        if (1.3*eve2Alice < eve2Bob){
+
+        // Velocity updates
+        // Eve's velocity update
+        var eve2Alice = distV3(Eve.position, Alice.position);
+        var eve2Bob = distV3(Eve.position, Bob.position);
+        if (eve2Alice < Alice.rad){ 
             eveFollowAlice = true;
-        } else {
+        } 
+        else if (eve2Alice - Alice.rad > eve2Bob - Bob.rad) { 
             eveFollowAlice = false;
         }
-        var currPos, curVel;
-        if (eveFollowAlice == true){
-            currPos = updatePosition(Eve, Alice, delta);
-            currVel = updateVelocity(Eve, Alice, delta);
+        if (eveFollowAlice){
+            //log(eveFollowAlice);
+            currVel = updateVelocity(Eve, Alice, delta);        
         } else {
-            currPos = updatePosition(Eve, Bob, delta);
+            log(eveFollowAlice);
             currVel = updateVelocity(Eve, Bob, delta);
         }
+        Eve.velocity = currVel;
+        // Alice's velocity update
+        currVel = updateVelocity(Alice, Bob, delta);
+        Alice.velocity = currVel;
+        // Carl velocity update
+        currVel = updateVelocity(Carl, Bob, delta);
+        Carl.velocity = currVel;
+        
+        // Position updates
+        // Eve's position update
+        currPos = updatePosition(Eve, Alice, delta);
+        currPos = updatePosition(Eve, Bob, delta);
         Eve.position.x = currPos.x;
         Eve.position.y = currPos.y;
         Eve.position.z = currPos.z;
-        Eve.velocity = currVel;
         
         // Alice update
         currPos = updatePosition(Alice, Bob, delta);
-        currVel = updateVelocity(Alice, Bob, delta);
         Alice.position.x = currPos.x;
         Alice.position.y = currPos.y;
         Alice.position.z = currPos.z;
-        Alice.velocity = currVel;
-        
-        // Carl update
+
+        // Carl's position update
         currPos = updatePosition(Carl, Bob, delta);
-        currVel = updateVelocity(Carl, Bob, delta);
         Carl.position.x = currPos.x;
         Carl.position.y = currPos.y;
         Carl.position.z = currPos.z;
-        Carl.velocity = currVel;
-        
+
         // Tail update
         tailObjects[0][tailIndex].position.copy(Eve.position);
         tailObjects[1][tailIndex].position.copy(Carl.position);
@@ -199,6 +221,7 @@ function getC6(m, k, b, delta){ return (1-b*delta/m); }
 function getC7(m, k, b, delta){ return b*delta/m; }
 
 function updatePosition(p, q, delta){
+    //var c0, c1, c2, c3;
     var c0 = getC0(p.m, p.k, p.b, delta);
     var c1 = getC1(p.m, p.k, p.b, delta);
     var c2 = getC2(p.m, p.k, p.b, delta);
@@ -216,19 +239,54 @@ function updatePosition(p, q, delta){
         disp.multiplyScalar(maxDistance/(dist+1));
         ppos.addVectors(qpos, disp);
     }
+    /*
+    var ppx = p.position.x, ppy = p.position.y, ppz = p.position.z;
+    var qqx = q.position.x, qqy = q.position.y, qqz = q.position.z;
+    var disp = Math.sqrt(Math.pow(ppx-qqx,2)+Math.pow(ppy-qqy,2)+Math.pow(ppz-qqz,2));
+    var ppos, pvel;
+    if (disp < invisibleVolumeFactor*(p.rad+q.rad)/2){
+        ppos = q.position.clone();
+        ppos.add(V3((environment.heat+invisibleVolumeFactor*q.rad)*(0.5-Math.random()),(environment.heat+invisibleVolumeFactor*q.rad)*(0.5-Math.random()),(environment.heat+invisibleVolumeFactor*q.rad)*(0.5-Math.random())));
+    } else {
+        pvel = p.velocity.clone();
+        pvel.multiplyScalar(delta);
+        ppos = V3().addVectors(q.position, pvel);
+    }
+    if (ppos.length > maxDistance){
+        ppos.multiplyScaler(maxDistance/(1+ppos.length));
+    }
+    */
     return ppos;
 }
 
 function updateVelocity(p, q, delta){
-    var c4 = getC4(p.m, p.k, p.b, delta);
-    var c5 = getC5(p.m, p.k, p.b, delta);
-    var c6 = getC6(p.m, p.k, p.b, delta);
-    var c7 = getC7(p.m, p.k, p.b, delta);
-    var vx = c4*p.position.x+c5*q.position.x+c6*p.velocity.x+c7*q.velocity.x+environment.heat*Math.random();
-    var vy = c4*p.position.y+c5*q.position.y+c6*p.velocity.y+c7*q.velocity.y+environment.heat*Math.random();
-    var vz = c4*p.position.z+c5*q.position.z+c6*p.velocity.z+c7*q.velocity.z+environment.heat*Math.random();
+    var c4, c5, c6, c7;
+    //log(0.5-Math.random());
+    var ppx = p.position.x, ppy = p.position.y, ppz = p.position.z;
+    var ppvx = p.velocity.x, ppvy = p.velocity.y, ppvz = p.velocity.z;
+    var qqx = q.position.x, qqy = q.position.y, qqz = q.position.z;
+    var vx, vy, vz, velDelta, rad;
+    var distance = dist3(ppx,ppy,ppz,qqx,qqy,qqz);
+    //if (distance < environment.strongDistance){ // under dev
+    if (true){
+        c4 = getC4(p.m, p.k, p.b, delta);
+        c5 = getC5(p.m, p.k, p.b, delta);
+        c6 = getC6(p.m, p.k, p.b, delta);
+        c7 = getC7(p.m, p.k, p.b, delta);
+        vx = c4*ppx+c5*qqx+c6*ppvx+c7*q.velocity.x;
+        vy = c4*ppy+c5*qqy+c6*ppvy+c7*q.velocity.y;
+        vz = c4*ppz+c5*qqz+c6*ppvz+c7*q.velocity.z;
+    } else {
+        velDelta = V3(qqx-ppx, qqy-ppy, qqz-ppz);
+        rad = velDelta.length;
+        velDelta.multiplyScalar(environment.gravity*q.m/(p.m*Math.pow(0.01+rad,0.5)));
+        velDelta.multiplyScalar(delta);
+        vx = ppvx+velDelta.x;
+        vy = ppvy+velDelta.y;
+        vz = ppvz+velDelta.z;
+    }
     // limiting speed:
-    var vel = V3(vx,vy,vz);
+    var vel = V3(vx+environment.heat*(0.5-Math.random()),vy+environment.heat*(0.5-Math.random()),vz+environment.heat*(0.5-Math.random()));
     var speed = vel.length();
     if (speed > c){
         vel.multiplyScalar(c/(speed+1));
@@ -242,20 +300,34 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+function apply(){
+    renderer.render(scene,camera);
+}
+
 function setupGui() {
     gui = new dat.GUI();
-    var folder = gui.addFolder("Bob Location");
-    folder.add(Bob.position, "x", -50, 50);
-    folder.__controllers[0].name("Position (x)");
-    folder.add(Bob.position, "z", -50, 50);
-    folder.__controllers[1].name("Position (y)");
-    folder = gui.addFolder("Constants");
-    folder.add(Alice, 'm', .01, Alice.m+2000);
-    folder.add(Alice, 'k', .01, Alice.k+2000);
-    folder.add(Alice, 'b', 0, 2000);
-    folder.__controllers[0].name(".m");
-    folder.__controllers[1].name(".k");
-    folder.__controllers[2].name(".b");
+    var folder;
+    folder = gui.addFolder("Bob");
+    folder.add(Bob.position, "x", -75*bobRad, 75*bobRad).name("position (x)").step(1);
+    folder.add(Bob.position, "y", -75*bobRad, 75*bobRad).name("position (y)").step(1);
+    folder.add(Bob.position, "z", -75*bobRad, 75*bobRad).name("position (z)").step(1);
+    folder.add(Bob, 'm').min(.01).max(1000).name("mass").step(1);
+    folder = gui.addFolder("Alice");
+    folder.add(Alice, 'm').min(.01).max(1000).name("mass").step(1);
+    folder.add(Alice, 'k').min(-200).max(1000).name("interaction").step(1);
+    folder.add(Alice, 'b').min(0).max(1000).name("damping").step(1);
+    folder = gui.addFolder("Carl");
+    folder.add(Carl, 'm').min(.01).max(1000).name("C's mass").step(1);
+    folder.add(Carl, 'k').min(-200).max(1000).name("C's interaction").step(1);
+    folder.add(Carl, 'b').min(0).max(1000).name("C's damping").step(1);
+    folder = gui.addFolder("Eve");
+    folder.add(Eve, 'm').min(.01).max(1000).name("E's mass").step(1);
+    folder.add(Eve, 'k').min(-200).max(1000).name("E's interaction").step(1);
+    folder.add(Eve, 'b').min(0).max(1000).name("E's damping").step(1);
+    folder = gui.addFolder("Environment");
+    folder.add(environment, 'heat').min(0).max(9001).name("Background Heat").step(1);
+    folder.add(environment, 'strongDistance').min(0).max(maxDistance/2).name("Interaction Boundaries").step(1);
+    folder.add(environment, 'gravity').min(0).max(9001).name("Far distance gravity").step(1);
 }
 
 function setLights() {
@@ -275,7 +347,10 @@ function V3(x,y,z){ return new THREE.Vector3(x,y,z);}
 function V4(x,y,z,w){ return new THREE.Vector4(x,y,z,w);}
 function F3(x,y,z){ return new THREE.Face3(x,y,z);}
 function log(check){ window.console.log(check);}
-function dist3(V3a, V3b){
+function dist3(x1,y1,z1,x2,y2,z2){
+    return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)+(z1-z2)*(z1-z2));
+}
+function distV3(V3a, V3b){
     var vx = V3a.x, vy = V3a.y, vz = V3a.z;
     var ux = V3b.x, uy = V3b.y, uz = V3b.z;
     return Math.sqrt((vx-ux)*(vx-ux)+(vy-uy)*(vy-uy)+(vz-uz)*(vz-uz));
