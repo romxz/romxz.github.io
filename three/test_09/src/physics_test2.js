@@ -20,7 +20,7 @@ var VIEW_SCALE = 0.8;
 var tailObjects = [[], []];
 var tailSegments = 30;
 var tailIndex = 0;
-var environment = {heat: 1, strongDistance: bobRad*20, gravity: 1000};
+var environment = {heat: 2, strongDistance: bobRad*20, gravity: 1000};
 
 function init() {
     var canvasWidth = window.innerWidth;
@@ -85,8 +85,9 @@ function init() {
     // Carl
     Carl = new THREE.Object3D();
     //MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.5});
-    var carlSphere = new THREE.Mesh(new THREE.SphereGeometry( carlRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff, transparent: true, opacity: 0.5} ));
+    var carlSphere = new THREE.Mesh(new THREE.SphereGeometry( carlRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff, transparent: true, opacity: 0.2} ));
     Carl.add(carlSphere);
+    Carl.mesh = carlSphere;
     Carl.m = mInit/10;
     Carl.k = kInit*2;
     Carl.b = bInit*10;
@@ -142,7 +143,7 @@ function render() {
     var delta = clock.getDelta();
     delta = Math.min(delta, 1);
     //log(delta);
-    //var time = Date.now()*0.001;
+    var time = clock.getElapsedTime();
     // Bob's position
     Bob.position.x = Bob.position.x + environment.heat*delta*(0.5-Math.random())/Bob.m;
     Bob.position.y = Bob.position.y + environment.heat*delta*(0.5-Math.random())/Bob.m;
@@ -156,7 +157,7 @@ function render() {
         //var time = Date.now()*0.001;
 
         // Update state variables
-        var currPos, currVel;
+        var currPos, currVel, currVel2;
 
         // Velocity updates
         // Eve's velocity update
@@ -169,11 +170,14 @@ function render() {
             eveFollowAlice = false;
         }
         if (eveFollowAlice){
-            //log(eveFollowAlice);
             currVel = updateVelocity(Eve, Alice, delta);        
         } else {
-            log(eveFollowAlice);
-            currVel = updateVelocity(Eve, Bob, delta);
+            currVel = updateVelocity(Eve, Alice, delta);
+            currVel.multiplyScalar((eve2Alice+0.05)/(eve2Alice+eve2Bob+0.1));
+            currVel2 = updateVelocity(Eve, Bob, delta);
+            currVel2.multiplyScalar((eve2Bob+0.05)/(eve2Alice+eve2Bob+0.1));
+            currVel.add(currVel2);
+            currVel.multiplyScalar(0.5);
         }
         Eve.velocity = currVel;
         // Alice's velocity update
@@ -182,7 +186,7 @@ function render() {
         // Carl velocity update
         currVel = updateVelocity(Carl, Bob, delta);
         Carl.velocity = currVel;
-        
+
         // Position updates
         // Eve's position update
         currPos = updatePosition(Eve, Alice, delta);
@@ -190,7 +194,7 @@ function render() {
         Eve.position.x = currPos.x;
         Eve.position.y = currPos.y;
         Eve.position.z = currPos.z;
-        
+
         // Alice update
         currPos = updatePosition(Alice, Bob, delta);
         Alice.position.x = currPos.x;
@@ -208,6 +212,11 @@ function render() {
         tailObjects[1][tailIndex].position.copy(Carl.position);
         tailIndex += 1;
         tailIndex = tailIndex % tailSegments;
+        
+        // Pulsating update
+        var velNormal = Carl.velocity.clone();
+        velNormal.normalize();
+        Carl.mesh.scale.set(1+0.3*velNormal.x*(1+Math.sin(2*Math.PI*time)), 1+0.3*velNormal.y*(1+Math.sin(3*Math.PI*time)), 1+0.3*velNormal.z*(1+Math.sin(5*Math.PI*time)));
     }
 }
 
@@ -325,7 +334,7 @@ function setupGui() {
     folder.add(Eve, 'k').min(-200).max(1000).name("E's interaction").step(1);
     folder.add(Eve, 'b').min(0).max(1000).name("E's damping").step(1);
     folder = gui.addFolder("Environment");
-    folder.add(environment, 'heat').min(0).max(9001).name("Background Heat").step(1);
+    folder.add(environment, 'heat').min(0).max(100).name("Background Heat").step(1);
     folder.add(environment, 'strongDistance').min(0).max(maxDistance/2).name("Interaction Boundaries").step(1);
     folder.add(environment, 'gravity').min(0).max(9001).name("Far distance gravity").step(1);
 }
