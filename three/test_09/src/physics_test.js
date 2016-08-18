@@ -8,9 +8,9 @@ var clock = new THREE.Clock();
 var lights = [];
 var state = { restart: false };
 var Alice, Bob;
-var mInit = 1000;
-var kInit = 0.6;
-var bInit = 35;
+var mInit = 500;
+var kInit = 100;
+var bInit = 15;
 var VIEW_SCALE = 0.8;
 
 function init() {
@@ -72,7 +72,7 @@ function init() {
 
 function render() {
     var delta = clock.getDelta();
-    log(delta);
+    //log(delta);
     cameraControls.update(delta);
     var time = Date.now()*0.001;
     var currPos = updatePosition(Alice, Bob, delta);
@@ -80,9 +80,9 @@ function render() {
     Alice.position.x = currPos.x;
     Alice.position.y = currPos.y;
     Alice.position.z = currPos.z;
-    log(Alice.position);
+    //log(Alice.position);
     Alice.velocity = currVel;
-    log(Alice.velocity);
+    //log(Alice.velocity);
 }
 
 function getC0(m, k, b, delta){ return (1-k*delta*delta/(2*m)); }
