@@ -7,16 +7,19 @@ var camera, scene, renderer, cameraControls, effectController, gui;
 var clock = new THREE.Clock();
 var lights = [];
 var state = { restart: false };
-var Alice, Bob, Eve;
-var aliceRad = 5, bobRad = 5, eveRad = 2;
-var mInit = 500;
-var kInit = 700;
-var bInit = 35;
+var Alice, Bob, Carl, Eve;
+var aliceRad = 9, bobRad = 10, carlRad = 9.5, eveRad = 8.5;
+var mInit = 20;
+var kInit = 1400;
+var bInit = 0;
 var c = 100;
 var maxDistance = 30;
 var eveFollowAlice = true;
 var VIEW_SCALE = 0.8;
-
+var tailObjects = [[], []];
+var tailSegments = 30;
+var tailIndex = 0;
+var environment = {heat: 5};
 
 function init() {
     var canvasWidth = window.innerWidth;
@@ -56,34 +59,78 @@ function init() {
 
     // Alice
     Alice = new THREE.Object3D();
-    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000} ));
+    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000, transparent: true, opacity: 0.8} ));
     Alice.m = mInit;
     Alice.k = kInit;
     Alice.b = bInit;
     Alice.add(aliceSphere);
     Alice.position.x = 1;
-    Alice.velocity = V3(5,5,5);
+    Alice.velocity = V3(5*aliceRad,5*aliceRad,5*aliceRad);
     scene.add(Alice);
 
     // Bob
     Bob = new THREE.Object3D();
-    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff} ));
+    //MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.5});
+    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.8} ));
+    Bob.add(bobSphere);
     Bob.m = mInit;
     Bob.k = kInit;
     Bob.b = bInit;
-    Bob.add(bobSphere);
     Bob.velocity = V3(0,0,0);
     scene.add(Bob);
+    
+    // Carl
+    Carl = new THREE.Object3D();
+    //MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.5});
+    var carlSphere = new THREE.Mesh(new THREE.SphereGeometry( carlRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff, transparent: true, opacity: 0.2} ));
+    Carl.add(carlSphere);
+    Carl.m = mInit/10;
+    Carl.k = kInit*2;
+    Carl.b = bInit*10;
+    Carl.velocity = V3(-carlRad,-carlRad,-carlRad);
+    scene.add(Carl);
 
     // Eve
     Eve = new THREE.Object3D();
-    var eveSphere = new THREE.Mesh(new THREE.SphereGeometry( eveRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ff00} ));
+    var eveSphere = new THREE.Mesh(new THREE.SphereGeometry( eveRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff00ff} ));
     Eve.m = mInit/10;
-    Eve.k = kInit*4;
+    Eve.k = kInit*2;
     Eve.b = bInit/3;
     Eve.add(eveSphere);
-    Eve.velocity = V3(5,-10,3);
+    Eve.velocity = V3(50*eveRad,-20*eveRad,-15*eveRad);
     scene.add(Eve);
+    
+    // Tails
+    var tailObject;
+    var tailSphere; 
+    var tailPosition;
+    var tailRad;
+    // Eve's tail
+    var tailColor = new THREE.Color();
+    for (var i = 0; i < tailSegments; i++){
+        // hacky function for curvy radiuses
+        tailRad = eveRad*Math.exp(-Math.pow(2*(i-tailSegments/2)/tailSegments,2));
+        tailColor.setRGB(1-i*0.5/tailSegments,i*0.5/tailSegments,1-i*0.5/tailSegments);
+        tailSphere = new THREE.Mesh(new THREE.SphereGeometry(tailRad, 32, 32), new THREE.MeshBasicMaterial({color:tailColor.getHex(), transparent: true, opacity: 0.2}));
+        tailObject = new THREE.Object3D();
+        tailObject.add(tailSphere);
+        tailObject.position.copy(Eve.position);
+        scene.add(tailObject);
+        tailObjects[0].push(tailObject);                                                                       
+    }
+    // Carl's tail
+    tailColor = new THREE.Color();
+    for (var i = 0; i < tailSegments; i++){
+        // hacky function for curvy radiuses
+        tailRad = carlRad*Math.exp(-Math.pow(2*(i-tailSegments/2)/tailSegments,2));
+        tailColor.setRGB(i*0.5/tailSegments,1-i*0.5/tailSegments, 1-i*0.5/tailSegments);
+        tailSphere = new THREE.Mesh(new THREE.SphereGeometry(tailRad, 32, 32), new THREE.MeshBasicMaterial({color:tailColor.getHex(), transparent: true, opacity: 0.2}));
+        tailObject = new THREE.Object3D();
+        tailObject.add(tailSphere);
+        tailObject.position.copy(Carl.position);
+        scene.add(tailObject);
+        tailObjects[1].push(tailObject);                                                                       
+    }
 }
 
 function render() {
@@ -93,6 +140,10 @@ function render() {
     if(delta <1){
         cameraControls.update(delta);
         //var time = Date.now()*0.001;
+        
+        // Position updates
+        var currPos, currVel;
+        
         // Eve update
         var eve2Alice = dist3(Eve.position, Alice.position);
         var eve2Bob = dist3(Eve.position, Bob.position);
@@ -109,18 +160,32 @@ function render() {
             currPos = updatePosition(Eve, Bob, delta);
             currVel = updateVelocity(Eve, Bob, delta);
         }
-        log(eve2Alice < eve2Bob);
         Eve.position.x = currPos.x;
         Eve.position.y = currPos.y;
         Eve.position.z = currPos.z;
         Eve.velocity = currVel;
+        
         // Alice update
-        var currPos = updatePosition(Alice, Bob, delta);
-        var currVel = updateVelocity(Alice, Bob, delta);
+        currPos = updatePosition(Alice, Bob, delta);
+        currVel = updateVelocity(Alice, Bob, delta);
         Alice.position.x = currPos.x;
         Alice.position.y = currPos.y;
         Alice.position.z = currPos.z;
         Alice.velocity = currVel;
+        
+        // Carl update
+        currPos = updatePosition(Carl, Bob, delta);
+        currVel = updateVelocity(Carl, Bob, delta);
+        Carl.position.x = currPos.x;
+        Carl.position.y = currPos.y;
+        Carl.position.z = currPos.z;
+        Carl.velocity = currVel;
+        
+        // Tail update
+        tailObjects[0][tailIndex].position.copy(Eve.position);
+        tailObjects[1][tailIndex].position.copy(Carl.position);
+        tailIndex += 1;
+        tailIndex = tailIndex % tailSegments;
     }
 }
 
@@ -159,9 +224,9 @@ function updateVelocity(p, q, delta){
     var c5 = getC5(p.m, p.k, p.b, delta);
     var c6 = getC6(p.m, p.k, p.b, delta);
     var c7 = getC7(p.m, p.k, p.b, delta);
-    var vx = c4*p.position.x+c5*q.position.x+c6*p.velocity.x+c7*q.velocity.x;
-    var vy = c4*p.position.y+c5*q.position.y+c6*p.velocity.y+c7*q.velocity.y;
-    var vz = c4*p.position.z+c5*q.position.z+c6*p.velocity.z+c7*q.velocity.z;
+    var vx = c4*p.position.x+c5*q.position.x+c6*p.velocity.x+c7*q.velocity.x+environment.heat*Math.random();
+    var vy = c4*p.position.y+c5*q.position.y+c6*p.velocity.y+c7*q.velocity.y+environment.heat*Math.random();
+    var vz = c4*p.position.z+c5*q.position.z+c6*p.velocity.z+c7*q.velocity.z+environment.heat*Math.random();
     // limiting speed:
     var vel = V3(vx,vy,vz);
     var speed = vel.length();
@@ -181,11 +246,13 @@ function setupGui() {
     gui = new dat.GUI();
     var folder = gui.addFolder("Bob Location");
     folder.add(Bob.position, "x", -50, 50);
-    folder.__controllers[0].name("position");
+    folder.__controllers[0].name("Position (x)");
+    folder.add(Bob.position, "z", -50, 50);
+    folder.__controllers[1].name("Position (y)");
     folder = gui.addFolder("Constants");
-    folder.add(Alice, 'm', .01, Alice.m+1000);
-    folder.add(Alice, 'k', .01, Alice.k+1000);
-    folder.add(Alice, 'b', .01, Alice.b+1000);
+    folder.add(Alice, 'm', .01, Alice.m+2000);
+    folder.add(Alice, 'k', .01, Alice.k+2000);
+    folder.add(Alice, 'b', 0, 2000);
     folder.__controllers[0].name(".m");
     folder.__controllers[1].name(".k");
     folder.__controllers[2].name(".b");
