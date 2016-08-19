@@ -70,7 +70,7 @@
             window.addEventListener('resize', function () {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setSize(VIEW_SCALE*window.innerWidth, VIEW_SCALE*window.innerHeight);
             }, false);
             initBones(); // make the skinned bones
             setupDatGui(); // set up gui controls

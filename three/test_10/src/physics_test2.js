@@ -1,4 +1,4 @@
-//"use strict"; // good practice - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
+"use strict"; // good practice - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
 ////////////////////////////////////////////////////////////////////////////////
 // Basic Head Structure: bust
 ////////////////////////////////////////////////////////////////////////////////
@@ -24,8 +24,8 @@ var tailIndex = 0;
 var environment = {heat: 2, strongDistance: bobRad*20, gravity: 1000};
 
 function init() {
-    var canvasWidth = VIEW_SCALE*window.innerWidth;
-    var canvasHeight = VIEW_SCALE*window.innerHeight;
+    var canvasWidth = window.innerWidth;
+    var canvasHeight = window.innerHeight;
     var canvasRatio = canvasWidth / canvasHeight;
 
     // RENDERER
@@ -34,7 +34,7 @@ function init() {
     });
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
-    renderer.setSize(canvasWidth, canvasHeight);
+    renderer.setSize(VIEW_SCALE*canvasWidth, VIEW_SCALE*canvasHeight);
     renderer.setClearColor(0x111111, 1.0);
     var container = document.getElementById('container');
     container.appendChild(renderer.domElement);
@@ -42,7 +42,7 @@ function init() {
     // SCENE
     scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x808080, 2000, 4000);
-    setLights(); // Lights
+    setLights();
 
     // CAMERA
     camera = new THREE.PerspectiveCamera(30, canvasRatio, 1, 10000);
@@ -56,7 +56,7 @@ function init() {
     window.addEventListener('resize', function () {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(canvasWidth, canvasHeight);
+        renderer.setSize(VIEW_SCALE*canvasWidth, VIEW_SCALE*canvasHeight);
     }, false);
 
     // Alice
@@ -336,10 +336,6 @@ function apply(){
 function setupGui() {
     gui = new dat.GUI();
     var folder;
-    folder = gui.addFolder("Environment");
-    folder.add(environment, 'heat').min(0).max(Math.max(100,environment.heat)).name("Heat").step(1);
-    folder.add(environment, 'strongDistance').min(0).max(Math.max(maxDistance/2, environment.strongDistance)).name("Boundaries").step(1);
-    //folder.add(environment, 'gravity').min(0).max(9001).name("Gravity").step(1);
     folder = gui.addFolder("Bob");
     folder.add(Bob.position, "x", -75*bobRad, 75*bobRad).name("position (x)").step(1);
     folder.add(Bob.position, "y", -75*bobRad, 75*bobRad).name("position (y)").step(1);
@@ -357,7 +353,10 @@ function setupGui() {
     folder.add(Eve, 'm').min(.01).max(1000).name("E's mass").step(1);
     folder.add(Eve, 'k').min(-200).max(Math.max(1000,kInit*10)).name("E's interaction").step(1);
     folder.add(Eve, 'b').min(0).max(1000).name("E's damping").step(1);
-    gui.open();
+    folder = gui.addFolder("Environment");
+    folder.add(environment, 'heat').min(0).max(Math.max(100,environment.heat)).name("Heat").step(1);
+    folder.add(environment, 'strongDistance').min(0).max(Math.max(maxDistance/2, environment.strongDistance)).name("Boundaries").step(1);
+    //folder.add(environment, 'gravity').min(0).max(9001).name("Gravity").step(1);
 }
 
 function setLights() {

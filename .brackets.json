@@ -1,6 +1,33 @@
 {
     "jscodehints.detectedExclusions": [
         "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_01/js/ThreeDebug.js",
-        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_01/js/THREEx.FullScreen.js"
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_01/js/THREEx.FullScreen.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_04/lib/three.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/three.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/three.min.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/OrbitAndPanControls.new.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/TrackballControls.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/tween.min.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/uclass_BeveledBlockGeometry.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/uclass_shaders.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/uclass_TeapotGeometry.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/src/08-set-the-pivot.js",
+        "three.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/lib/stats.min.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/src/unit4-robot_arm_demo.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/Detector.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/Coordinates.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/dat.gui.min.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/OrbitAndPanControls.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/PlaneGeometry.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/stats.min.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/Three.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_05/src/head_frame_test.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/TrackballControls.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/tween.min.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/uclass_shaders.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_07/build/three.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/js/uclass_TeapotGeometry.js",
+        "C:/Users/Andrei/OneDrive/Documents/gitWeb/romxz.github.io/three/test_06/src/main.js"
     ]
 }
