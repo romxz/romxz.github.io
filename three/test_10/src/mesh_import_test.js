@@ -47,7 +47,7 @@ function init() {
     
     /*add loader call add model function*/
     loader = new THREE.JSONLoader();
-    loader.load('../json/test_bones.json', addModel);
+    loader.load('json/test_bones.json', addModel);
     
     // Testing geometry view
     /*
