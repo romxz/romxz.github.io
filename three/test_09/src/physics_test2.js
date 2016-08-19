@@ -9,6 +9,7 @@ var lights = [];
 //var state = { restart: false };
 var Alice, Bob, Carl, Eve;
 var aliceRad = 9, bobRad = 10, carlRad = 9.5, eveRad = 8.5;
+var carlScale; //, carlColor, bobColor;
 var invisibleVolumeFactor = 0.2;
 var mInit = 500;
 var kInit = 700;
@@ -61,6 +62,7 @@ function init() {
     // Alice
     Alice = new THREE.Object3D();
     var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000, transparent: true, opacity: 0.9} ));
+    Alice.mesh = aliceSphere;
     Alice.m = mInit;
     Alice.k = kInit;
     Alice.b = bInit;
@@ -72,8 +74,10 @@ function init() {
 
     // Bob
     Bob = new THREE.Object3D();
+    Bob.bobColor = new THREE.Color(0x0000ff);
     //MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.5});
     var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff, transparent: true, opacity: 0.5} ));
+    Bob.mesh = bobSphere;
     Bob.m = mInit;
     Bob.k = kInit;
     Bob.b = bInit;
@@ -84,8 +88,9 @@ function init() {
 
     // Carl
     Carl = new THREE.Object3D();
+    Carl.color = new THREE.Color(0x00ffff);
     //MeshLambertMaterial({color: 0x0000ff, transparent: true, opacity: 0.5});
-    var carlSphere = new THREE.Mesh(new THREE.SphereGeometry( carlRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff, transparent: true, opacity: 0.2} ));
+    var carlSphere = new THREE.Mesh(new THREE.SphereGeometry( carlRad, 32, 32 ), new THREE.MeshLambertMaterial( {color: Carl.color.getHex(), transparent: true, opacity: 0.7} ));
     Carl.add(carlSphere);
     Carl.mesh = carlSphere;
     Carl.m = mInit/10;
@@ -93,11 +98,14 @@ function init() {
     Carl.b = bInit*10;
     Carl.rad = carlRad;
     Carl.velocity = V3(-carlRad,-carlRad,-carlRad);
+    Carl.sc = Carl.velocity.clone();
+    Carl.sc.normalize();
     scene.add(Carl);
 
     // Eve
     Eve = new THREE.Object3D();
     var eveSphere = new THREE.Mesh(new THREE.SphereGeometry( eveRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ff00, transparent: true, opacity: 0.7} ));
+    Eve.mesh = eveSphere;
     Eve.m = mInit/10;
     Eve.k = kInit*4;
     Eve.b = bInit/3;
@@ -149,10 +157,10 @@ function render() {
     Bob.position.y = Bob.position.y + environment.heat*delta*(0.5-Math.random())/Bob.m;
     Bob.position.z = Bob.position.z + environment.heat*delta*(0.5-Math.random())/Bob.m;
 
-    if(delta <1){
-        scene.rotation.x += .1*delta;
-        scene.rotation.y += .05*delta;
-        scene.rotation.z += .025*delta;
+    if(delta <1){ // to avoid very high changes, only apply them if latency is small
+        scene.rotation.x += .01*delta;
+        scene.rotation.y += .005*delta;
+        scene.rotation.z += .0025*delta;
         cameraControls.update(delta);
         //var time = Date.now()*0.001;
 
@@ -213,12 +221,21 @@ function render() {
         tailIndex += 1;
         tailIndex = tailIndex % tailSegments;
 
-        // Pulsating update
-        var velNormal = Carl.velocity.clone();
-        if (velNormal.length > 1){
-            velNormal.normalize();    
-        }
-        Carl.mesh.scale.set(0.9+0.05*Math.abs(velNormal.x*Math.sin(0.5*Math.PI*time)), 0.9+0.05*Math.abs(velNormal.y*Math.sin(Math.PI*time+1)), 0.9+0.05*Math.abs(velNormal.z*Math.sin(0.3*Math.PI*time+3)));
+        // Pulsating updates
+        // Alice
+        Alice.mesh.scale.set(0.9+0.1*Math.pow(Math.sin(5*Math.PI*time),2), 0.9+0.1*Math.pow(Math.sin(5*Math.PI*time+1),2), 0.9+0.1*Math.pow(Math.sin(5*Math.PI*time+2),2));
+        // Bob
+        Bob.mesh.scale.set(0.9+0.1*Math.pow(Math.sin(5*Math.PI*time+0.4),2), 0.9+0.1*Math.pow(Math.sin(5*Math.PI*time+1.4),2), 0.9+0.1*Math.pow(Math.sin(5*Math.PI*time+2.1),2));
+        var bobColorNew = new THREE.Color(0xffffff);
+        bobColorNew.lerp(Bob.bobColor, Math.abs(Math.sin(Math.PI*time+0.3)));
+        Bob.mesh.material.color = bobColorNew;
+        // Carl
+        Carl.mesh.scale.set(0.8+0.4*Math.pow(Math.sin(Math.PI*time),2), 0.8+0.4*Math.pow(Math.sin(Math.PI*time+1),2), 0.8+0.4*Math.pow(Math.sin(Math.PI*time+2),2));
+        Carl.mesh.material.color.setRGB(0.4,0.2+0.8*Math.pow(Math.sin(Math.PI*time),2),0.2+0.8*Math.pow(Math.cos(Math.PI*time),2));
+        // Eve
+        Eve.mesh.scale.set(0.8+0.4*Math.pow(Math.sin(2*Math.PI*time),2), 0.8+0.4*Math.pow(Math.sin(2*Math.PI*time+1),2), 0.8+0.4*Math.pow(Math.sin(2*Math.PI*time+2),2));
+        Eve.mesh.material.color.setRGB(0.2+0.8*Math.pow(Math.sin(Math.PI*time),2),1,0.2*Math.pow(Math.cos(0.1*Math.PI*time),2));
+        
     }
 }
 
@@ -311,9 +328,10 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+/*
 function apply(){
     renderer.render(scene,camera);
-}
+}*/
 
 function setupGui() {
     gui = new dat.GUI();
@@ -325,20 +343,20 @@ function setupGui() {
     folder.add(Bob, 'm').min(.01).max(1000).name("mass").step(1);
     folder = gui.addFolder("Alice");
     folder.add(Alice, 'm').min(.01).max(1000).name("mass").step(1);
-    folder.add(Alice, 'k').min(-200).max(1000).name("interaction").step(1);
+    folder.add(Alice, 'k').min(-200).max(Math.max(1000,kInit*10)).name("interaction").step(1);
     folder.add(Alice, 'b').min(0).max(1000).name("damping").step(1);
     folder = gui.addFolder("Carl");
     folder.add(Carl, 'm').min(.01).max(1000).name("C's mass").step(1);
-    folder.add(Carl, 'k').min(-200).max(1000).name("C's interaction").step(1);
+    folder.add(Carl, 'k').min(-200).max(Math.max(1000,kInit*10)).name("C's interaction").step(1);
     folder.add(Carl, 'b').min(0).max(1000).name("C's damping").step(1);
     folder = gui.addFolder("Eve");
     folder.add(Eve, 'm').min(.01).max(1000).name("E's mass").step(1);
-    folder.add(Eve, 'k').min(-200).max(1000).name("E's interaction").step(1);
+    folder.add(Eve, 'k').min(-200).max(Math.max(1000,kInit*10)).name("E's interaction").step(1);
     folder.add(Eve, 'b').min(0).max(1000).name("E's damping").step(1);
     folder = gui.addFolder("Environment");
-    folder.add(environment, 'heat').min(0).max(100).name("Background Heat").step(1);
-    folder.add(environment, 'strongDistance').min(0).max(maxDistance/2).name("Interaction Boundaries").step(1);
-    folder.add(environment, 'gravity').min(0).max(9001).name("Far distance gravity").step(1);
+    folder.add(environment, 'heat').min(0).max(Math.max(100,environment.heat)).name("Heat").step(1);
+    folder.add(environment, 'strongDistance').min(0).max(Math.max(maxDistance/2, environment.strongDistance)).name("Boundaries").step(1);
+    //folder.add(environment, 'gravity').min(0).max(9001).name("Gravity").step(1);
 }
 
 function setLights() {
