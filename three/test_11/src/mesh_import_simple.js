@@ -173,26 +173,6 @@ $(function(){
 
 
     function render() {
-        /*dae.traverse(function (child){
-			if (child.colladaId == "Cube"){
-				child.rotation.y  += .01;
-			}
-			else if (child.colladaId == "Sphere"){
-				child.rotation.y  -= .01;
-			}	
-		});*/		
-        //savedObjects[0].rotation.y += 0.01;
-        //savedObjects[1].rotation.z -= 0.01;
-        //log(savedObjects['CubeFrameo']);
-        //savedObjects["CubeFrameo"].rotation.y += 0.01;
-        //log(savedObjects.CubeFrameo);
-        //log(savedObjects.Bone2);
-        //savedObjects.Bone2.position.z -= 0.01;
-        //log(savedObjects.Bone2.position.z);
-        //savedObjects.CubeFrameo.rotation.y += 0.01;
-        //savedObjects.skinnedObject.skeleton.bones[0].rotation.z += 0.01;
-        //savedObjects.skinnedObject.skeleton.bones[1].rotation.y += 0.01;
-        //savedObjects.skinnedObject.skeleton.bones[2].rotation.x += 0.01;
         savedObjects.skinnedObject.skeleton.bones[3].rotation.z += 0.01;
 
         spotLight.position.x = guiControls.lightX;

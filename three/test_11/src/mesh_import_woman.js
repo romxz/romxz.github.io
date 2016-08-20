@@ -44,10 +44,17 @@ $(function(){
                 log('Saved sphereTesto');
                 savedObjects.SphereTesto = child;
                 log(savedObjects);
-            } else if (child instanceof THREE.SkinnedMesh){
-                log('saved instanceof skinnedmesh');
-                savedObjects.skinnedObject = child;
-            }	
+            } else if (child.colladaId == "woman_02-female_generic"){
+                /*if (child instanceof THREE.SkinnedMesh){
+                    log('saved instanceof skinnedmesh');
+                    savedObjects.skinnedObject = child;
+                }*/
+                log('saved child of woman_02-female_generic:');
+                log(child.children);
+                savedObjects.SkinnedSaved = child.children[0];
+                log(savedObjects.SkinnedSaved);
+                log(savedObjects.SkinnedSaved.material);
+            }
         });
         log(savedObjects.length);
         dae.updateMatrix();
@@ -65,7 +72,7 @@ $(function(){
         renderer.setSize(VIEW_SCALE*window.innerWidth, VIEW_SCALE*window.innerHeight);
         renderer.shadowMapEnabled= true;
         renderer.shadowMapSoft = true;
-        
+
         // test sphere
         var sphereTest = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 32), new THREE.MeshBasicMaterial({color: 0xff0000}));
         //scene.add(sphereTest);
@@ -79,7 +86,7 @@ $(function(){
         camera.position.z = 1.5;	
         //camera.lookAt(scene.position);
         camera.lookAt(V3(-0.2,0.2,-1.5));
-        
+
         dae.position.y -= 1;
         scene.add(dae);
         /*datGUI controls object*/
@@ -187,8 +194,8 @@ $(function(){
 				child.rotation.y  -= .01;
 			}	
 		});*/		
-        
-        
+
+        savedObjects.SkinnedSaved.skeleton.bones[3].rotation.y += 0.01;
         //savedObjects.skinnedObject.skeleton.bones[3].rotation.z += 0.01;
 
         spotLight.position.x = guiControls.lightX;
@@ -203,7 +210,7 @@ $(function(){
         stats.update();		
         renderer.render(scene, camera);
     }
-    
+
     function V3(x,y,z){
         return new THREE.Vector3(x,y,z);
     }
