@@ -11,12 +11,12 @@ $(function(){
     loader.options.convertUpAxis = false;
     loader.load('./json/woman_bust4.dae', function (collada){
         dae = collada.scene;
-        dae.scale.x = dae.scale.y = dae.scale.z = 1;
+        // dae.scale.x = dae.scale.y = dae.scale.z = 1;
         dae.traverse(function (child){
             if (child instanceof THREE.SkinnedMesh){
                 var id = child.parent.colladaId;
-                log('mesh from colladaId == ' + id + ':');
-                log(child);
+                //log('mesh from colladaId == ' + id + ':');
+                //log(child);
                 savedMeshes[id] = child;
             }
         });
@@ -24,7 +24,8 @@ $(function(){
         init();
         animate();
         log(scene);
-    });	
+    });
+    
     function init(){
         /*creates empty scene object and renderer*/
         scene = new THREE.Scene();
@@ -90,32 +91,26 @@ $(function(){
         /*adds controls to scene*/
         datGUI = new dat.GUI();
         datGUI.addFolder("Movement Control");
-        for (var i= 0; i < bonesArray.length-1; i++){
-            datGUI.add(guiControls, 'Bone_'+i+'_(x)', -1, 1).onChange(function(value){
+        log('-----'); log('-----'); log('-----');
+        for (let i = 0; i < bonesArray.length-1; i++){
+            var textControl = 'Bone_'+i+'_(x)';
+            datGUI.add(guiControls, textControl, -1, 1).onChange(function(value){
                 for (var key in savedMeshes){
                     if (savedMeshes.hasOwnProperty(key)){
-                        log(key);
-                        log('savedMeshes[key]:');
-                        log(savedMeshes[key]);
-                        log('skeleton:');
-                        log(savedMeshes[key].skeleton);
-                        log('bones');
-                        log(savedMeshes[key].skeleton.bones);
-                        log(''+i+'th bone:');
-                        log(savedMeshes[key].skeleton.bones[i]);
                         savedMeshes[key].skeleton.bones[i].rotation.x = value;
-                        //key.skeleton.bones[i].rotation.x = value;
                     }
                 }
             });
-            datGUI.add(guiControls, 'Bone_'+i+'_(y)', -1, 1).onChange(function(value){
+            textControl = 'Bone_'+i+'_(y)';
+            datGUI.add(guiControls, textControl, -1, 1).onChange(function(value){
                 for (var key in savedMeshes){
                     if (savedMeshes.hasOwnProperty(key)){
                         savedMeshes[key].skeleton.bones[i].rotation.y = value;
                     }
                 }
             });
-            datGUI.add(guiControls, 'Bone_'+i+'_(z)', -1, 1).onChange(function(value){
+            textControl = 'Bone_'+i+'_(z)';
+            datGUI.add(guiControls, textControl, -1, 1).onChange(function(value){
                 for (var key in savedMeshes){
                     if (savedMeshes.hasOwnProperty(key)){
                         savedMeshes[key].skeleton.bones[i].rotation.z = value;
