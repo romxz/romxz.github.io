@@ -184,7 +184,7 @@ $(function(){
         $("#webGL-container").append( stats.domElement );		
     }
 
-
+    var direction = 1;
     function render() {
         /*dae.traverse(function (child){
 			if (child.colladaId == "Cube"){
@@ -194,8 +194,13 @@ $(function(){
 				child.rotation.y  -= .01;
 			}	
 		});*/		
-
-        savedObjects.SkinnedSaved.skeleton.bones[3].rotation.y += 0.01;
+        var testObj = savedObjects.SkinnedSaved.skeleton.bones[3];
+        if (testObj.rotation.y > 1 && direction == 1){
+            direction = -1;
+        } else if (testObj.rotation.y < -1 && direction == -1){
+            direction = 1;
+        }
+        testObj.rotation.y += direction*0.01;
         //savedObjects.skinnedObject.skeleton.bones[3].rotation.z += 0.01;
 
         spotLight.position.x = guiControls.lightX;
