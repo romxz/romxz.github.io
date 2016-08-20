@@ -4,7 +4,7 @@ $(function(){
     var stats;
     var dae, spotLight;
     var SCREEN_WIDTH, SCREEN_HEIGHT;
-    var savedObjects = {};
+    var savedMeshes = {};
     var VIEW_SCALE = 0.8;
 
     var loader = new  THREE.ColladaLoader();
@@ -17,7 +17,7 @@ $(function(){
                 var id = child.parent.colladaId;
                 log('mesh from colladaId == ' + id + ':');
                 log(child);
-                savedObjects[id] = child;
+                savedMeshes[id] = child;
             }
         });
         dae.updateMatrix();
@@ -33,7 +33,7 @@ $(function(){
 
         renderer.setClearColor(0x000000);
         renderer.setSize(VIEW_SCALE*window.innerWidth, VIEW_SCALE*window.innerHeight);
-        renderer.shadowMapEnabled= true;
+        renderer.shadowMap.enabled= true;
         renderer.shadowMapSoft = true;
 
         // test sphere
@@ -65,16 +65,16 @@ $(function(){
             this.distance = 373;
             this.angle = 1.6;
             this.exponent = 38;
-            this.shadowCameraNear = 34;
-            this.shadowCameraFar = 2635;
-            this.shadowCameraFov = 68;
-            this.shadowCameraVisible=false;
-            this.shadowMapWidth=512;
-            this.shadowMapHeight=512;
-            this.shadowBias=0.00;
-            this.shadowDarkness=0.11;		
-
         }
+        var firstKey = Object.keys(savedMeshes)[0];
+        var bonesArray = savedMeshes[firstKey].skeleton.bones;
+        for (var i = 0; i < bonesArray.length; i++){
+            guiControls['Bone_'+i+'_(x)'] = 0.0;
+            guiControls['Bone_'+i+'_(y)'] = 0.0;
+            guiControls['Bone_'+i+'_(z)'] = 0.0;
+        }
+        log('guiControls:');
+        log(guiControls);
         /*adds spot light with starting parameters*/
         spotLight = new THREE.SpotLight(0xffffff);
         spotLight.castShadow = true;
@@ -82,13 +82,6 @@ $(function(){
         spotLight.intensity = guiControls.intensity;		
         spotLight.distance = guiControls.distance;
         spotLight.angle = guiControls.angle;
-        spotLight.exponent = guiControls.exponent;
-        spotLight.shadowCameraNear = guiControls.shadowCameraNear;
-        spotLight.shadowCameraFar = guiControls.shadowCameraFar;
-        spotLight.shadowCameraFov = guiControls.shadowCameraFov;
-        spotLight.shadowCameraVisible = guiControls.shadowCameraVisible;
-        spotLight.shadowBias = guiControls.shadowBias;
-        spotLight.shadowDarkness = guiControls.shadowDarkness;
         scene.add(spotLight);
 
         var light = new THREE.AmbientLight( 0x404040 ); // soft white light
@@ -96,11 +89,44 @@ $(function(){
 
         /*adds controls to scene*/
         datGUI = new dat.GUI();
-
+        datGUI.addFolder("Movement Control");
+        for (var i= 0; i < bonesArray.length-1; i++){
+            datGUI.add(guiControls, 'Bone_'+i+'_(x)', -1, 1).onChange(function(value){
+                for (var key in savedMeshes){
+                    if (savedMeshes.hasOwnProperty(key)){
+                        log(key);
+                        log('savedMeshes[key]:');
+                        log(savedMeshes[key]);
+                        log('skeleton:');
+                        log(savedMeshes[key].skeleton);
+                        log('bones');
+                        log(savedMeshes[key].skeleton.bones);
+                        log(''+i+'th bone:');
+                        log(savedMeshes[key].skeleton.bones[i]);
+                        savedMeshes[key].skeleton.bones[i].rotation.x = value;
+                        //key.skeleton.bones[i].rotation.x = value;
+                    }
+                }
+            });
+            datGUI.add(guiControls, 'Bone_'+i+'_(y)', -1, 1).onChange(function(value){
+                for (var key in savedMeshes){
+                    if (savedMeshes.hasOwnProperty(key)){
+                        savedMeshes[key].skeleton.bones[i].rotation.y = value;
+                    }
+                }
+            });
+            datGUI.add(guiControls, 'Bone_'+i+'_(z)', -1, 1).onChange(function(value){
+                for (var key in savedMeshes){
+                    if (savedMeshes.hasOwnProperty(key)){
+                        savedMeshes[key].skeleton.bones[i].rotation.z = value;
+                    }
+                }
+            });
+        }
+        datGUI.addFolder("Lights");
         datGUI.add(guiControls, 'lightX',-60,180);	
         datGUI.add(guiControls, 'lightY',0,180);	
         datGUI.add(guiControls, 'lightZ',-60,180);
-
         datGUI.add(guiControls, 'intensity',0.01, 5).onChange(function(value){
             spotLight.intensity = value;
         });		
@@ -109,35 +135,9 @@ $(function(){
         });	
         datGUI.add(guiControls, 'angle',0.001, 1.570).onChange(function(value){
             spotLight.angle = value;
-        });		
-        datGUI.add(guiControls, 'exponent',0 ,50 ).onChange(function(value){
-            spotLight.exponent = value;
-        });
-        datGUI.add(guiControls, 'shadowCameraNear',0,100).name("Near").onChange(function(value){		
-            spotLight.shadowCamera.near = value;
-            spotLight.shadowCamera.updateProjectionMatrix();		
-        });
-        datGUI.add(guiControls, 'shadowCameraFar',0,5000).name("Far").onChange(function(value){
-            spotLight.shadowCamera.far = value;
-            spotLight.shadowCamera.updateProjectionMatrix();
-        });
-        datGUI.add(guiControls, 'shadowCameraFov',1,180).name("Fov").onChange(function(value){
-            spotLight.shadowCamera.fov = value;
-            spotLight.shadowCamera.updateProjectionMatrix();
-        });
-        datGUI.add(guiControls, 'shadowCameraVisible').onChange(function(value){
-            spotLight.shadowCameraVisible = value;
-            spotLight.shadowCamera.updateProjectionMatrix();
-        });
-        datGUI.add(guiControls, 'shadowBias',0,1).onChange(function(value){
-            spotLight.shadowBias = value;
-            spotLight.shadowCamera.updateProjectionMatrix();
-        });
-        datGUI.add(guiControls, 'shadowDarkness',0,1).onChange(function(value){
-            spotLight.shadowDarkness = value;
-            spotLight.shadowCamera.updateProjectionMatrix();
-        });
-        datGUI.close();
+        });	
+        datGUI.open();
+
         $("#webGL-container").append(renderer.domElement);
         /*stats*/
         stats = new Stats();		
@@ -149,18 +149,19 @@ $(function(){
 
     var direction = 1;
     function render() {
+        /*
         var randomMovX = Math.random();
         var randomMovY = Math.random();
         var randomMovZ = Math.random();
-        for (var key in savedObjects){
-            if (savedObjects.hasOwnProperty(key)){
-                for (var i = 0; i < savedObjects[key].skeleton.bones.length; i++){
-                    savedObjects[key].skeleton.bones[i].rotation.x += randomMovX*0.05;
-                    savedObjects[key].skeleton.bones[i].rotation.y += randomMovY*0.05; 
-                    savedObjects[key].skeleton.bones[i].rotation.z += randomMovZ*0.05; 
+        for (var key in savedMeshes){
+            if (savedMeshes.hasOwnProperty(key)){
+                for (var i = 0; i < savedMeshes[key].skeleton.bones.length; i++){
+                    savedMeshes[key].skeleton.bones[i].rotation.x += randomMovX*0.05;
+                    savedMeshes[key].skeleton.bones[i].rotation.y += randomMovY*0.05; 
+                    savedMeshes[key].skeleton.bones[i].rotation.z += randomMovZ*0.05; 
                 }
             }
-        }
+        }*/
         spotLight.position.x = guiControls.lightX;
         spotLight.position.y = guiControls.lightY;
         spotLight.position.z = guiControls.lightZ;
