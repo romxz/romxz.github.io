@@ -1,5 +1,4 @@
 $(function(){
-
     var scene, camera, renderer;
     var controls, guiControls, datGUI;
     var stats;
@@ -10,53 +9,17 @@ $(function(){
 
     var loader = new  THREE.ColladaLoader();
     loader.options.convertUpAxis = false;
-    //loader.load('https://cdn.rawgit.com/wpdildine/wpdildine.github.com/master/models/monkey.dae',
     loader.load('./json/woman_bust4.dae', function (collada){
         dae = collada.scene;
         dae.scale.x = dae.scale.y = dae.scale.z = 1;
         dae.traverse(function (child){
-            if (child.colladaId == "BoneThingy"){
-                child.traverse(function(e){
-                    e.castShadow = true;
-                    e.receiveShadow = true;
-                    if (e.material instanceof THREE.MeshPhongMaterial){
-                        e.material.needsUpdate = true;
-                    }
-                    if (e.colladaId == "Bone_002"){
-                        savedObjects.Bone2 = e;
-                        log(savedObjects);
-                        log('bone2 saved');
-                    } else if (e.colladaId == "CubeFrameo"){
-                        savedObjects.CubeFrameo = e;
-                        log('CubeFrameo saved');
-                        log(savedObjects);
-                    }
-                });
-                log('Saved cubeBone');
-                savedObjects.BoneThingy = child;
-                log(savedObjects);
-            }
-            else if (child.colladaId == "SphereTesto"){
-                child.traverse(function(e){
-                    e.castShadow = true;
-                    e.receiveShadow = true;
-                });
-                log('Saved sphereTesto');
-                savedObjects.SphereTesto = child;
-                log(savedObjects);
-            } else if (child.colladaId == "woman_02-female_generic"){
-                /*if (child instanceof THREE.SkinnedMesh){
-                    log('saved instanceof skinnedmesh');
-                    savedObjects.skinnedObject = child;
-                }*/
-                log('saved child of woman_02-female_generic:');
-                log(child.children);
-                savedObjects.SkinnedSaved = child.children[0];
-                log(savedObjects.SkinnedSaved);
-                log(savedObjects.SkinnedSaved.material);
+            if (child instanceof THREE.SkinnedMesh){
+                var id = child.parent.colladaId;
+                log('mesh from colladaId == ' + id + ':');
+                log(child);
+                savedObjects[id] = child;
             }
         });
-        log(savedObjects.length);
         dae.updateMatrix();
         init();
         animate();
@@ -186,27 +149,21 @@ $(function(){
 
     var direction = 1;
     function render() {
-        /*dae.traverse(function (child){
-			if (child.colladaId == "Cube"){
-				child.rotation.y  += .01;
-			}
-			else if (child.colladaId == "Sphere"){
-				child.rotation.y  -= .01;
-			}	
-		});*/		
-        var testObj = savedObjects.SkinnedSaved.skeleton.bones[3];
-        if (testObj.rotation.y > 1 && direction == 1){
-            direction = -1;
-        } else if (testObj.rotation.y < -1 && direction == -1){
-            direction = 1;
+        var randomMovX = Math.random();
+        var randomMovY = Math.random();
+        var randomMovZ = Math.random();
+        for (var key in savedObjects){
+            if (savedObjects.hasOwnProperty(key)){
+                for (var i = 0; i < savedObjects[key].skeleton.bones.length; i++){
+                    savedObjects[key].skeleton.bones[i].rotation.x += randomMovX*0.05;
+                    savedObjects[key].skeleton.bones[i].rotation.y += randomMovY*0.05; 
+                    savedObjects[key].skeleton.bones[i].rotation.z += randomMovZ*0.05; 
+                }
+            }
         }
-        testObj.rotation.y += direction*0.01;
-        //savedObjects.skinnedObject.skeleton.bones[3].rotation.z += 0.01;
-
         spotLight.position.x = guiControls.lightX;
         spotLight.position.y = guiControls.lightY;
         spotLight.position.z = guiControls.lightZ;
-
     }
 
     function animate(){
