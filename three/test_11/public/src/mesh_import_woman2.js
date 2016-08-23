@@ -175,27 +175,51 @@ $(function(){
         stats.domElement.style.top = '0px';		
         $("#webGL-container").append( stats.domElement );		
     }
-    
+
     function getData(channel) {
-  			httpGet('/device/' + channel, update);
+        httpGet('/device/' + channel, update);
     }
-    
+
     function update(data) {
-            var res = data.split(" ");
-            var randomMovX = res[2];//parseFloat(data.substring(0,1));
-            var randomMovY = res[0]; //parseFloat(data.substring(2,3));
-            var randomMovZ = res[1];//parseFloat(data.substring(4,5));
-            for (var key in savedMeshes){
+        var res = data.split(" ");
+        var randomMovX = res[1];//parseFloat(data.substring(0,1));
+        var randomMovY = res[0]; //parseFloat(data.substring(2,3));
+        var randomMovZ = res[2];//parseFloat(data.substring(4,5));
+        var minX = -60; var maxX = 60;
+        var minY = -60; var maxY = 60;
+        var minZ = -60; var maxZ = 60;
+        for (var key in savedMeshes){
             if (savedMeshes.hasOwnProperty(key)){
-                    var i = 1;
-                    savedMeshes[key].skeleton.bones[i].rotation.x = randomMovX*0.01;
-                    savedMeshes[key].skeleton.bones[i].rotation.y = randomMovY*0.01; 
-                    savedMeshes[key].skeleton.bones[i].rotation.z = randomMovZ*0.1; 
-                
+                var i = 3;
+                log('X:');
+                log(randomMovX);
+                log('Y:');
+                log(randomMovY);
+                log('Z:');
+                log(randomMovZ);
+                if (randomMovX > maxX){
+                    randomMovX = maxX;
+                } else if (randomMovX < minX){
+                    randomMovX = minX;
+                }
+                if (randomMovY > maxY){
+                    randomMovY = maxY;
+                } else if (randomMovY < minY){
+                    randomMovY = minY;
+                }
+                if (randomMovZ > maxZ){
+                    randomMovZ = maxZ;
+                } else if (randomMovZ < minZ){
+                    randomMovZ = minZ;
+                }
+                savedMeshes[key].skeleton.bones[i].rotation.x = randomMovX*0.01;
+                savedMeshes[key].skeleton.bones[i].rotation.y = randomMovY*0.2; 
+                savedMeshes[key].skeleton.bones[i].rotation.z = randomMovZ*0.01; 
+
             }
         }
     } 
-    
+
     var direction = 1;
     function render() {
         var a = getData(3);/*
@@ -208,7 +232,7 @@ $(function(){
                     //savedMeshes[key].skeleton.bones[i].rotation.x += randomMovX*0.05;
                     //savedMeshes[key].skeleton.bones[i].rotation.y += randomMovY*0.05; 
                     //savedMeshes[key].skeleton.bones[i].rotation.z += randomMovZ*0.05; 
-                
+
             }
         }*/
         spotLight.position.x = guiControls.lightX;
