@@ -36,8 +36,7 @@ index.js
 public/index.html
 
 •	Renders a 3D model that can be controlled using serial data. 
-•	Imports the relevant JS modules and CSS styling used in the webpage. 
-Runs a script to make a looping request to the server. 
+•	Imports the relevant JS modules and CSS styling used in the webpage. Runs a script to make a looping request to the server. 
 •	Makes a call to src/mesh_import_woman2.js
 
 public/src/mesh_import_woman2.js
