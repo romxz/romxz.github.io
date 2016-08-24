@@ -1,10 +1,10 @@
 # romxz.github.io
 
-Introduction
+#Introduction
 
 Our code creates a 3D render of a human bust which can be controlled using serial data (from Arduino) and a graphical user interface control panel. Features include: zoom in/out, lighting control, camera control. 
 
-Definitions
+#Definitions
 
 •	Serial Communication and Serial Ports
 
@@ -30,15 +30,21 @@ File Explanations
 
 index.js
 
-•	Initializes communication with the serial port and opens up a server.  
+•	Initializes communication with the serial port and opens up a server. 
+
 •	Gets an analog reading from the serial port and writes it to a client.
+
 
 public/index.html
 
 •	Renders a 3D model that can be controlled using serial data. 
+
 •	Imports the relevant JS modules and CSS styling used in the webpage.
+
 •	Runs a script to make a looping request to the server. 
-•	Makes a call to src/mesh_import_woman2.js
+
+•	Makes a call to src/mesh_import_woman2.
+
 
 public/src/mesh_import_woman2.js
 
