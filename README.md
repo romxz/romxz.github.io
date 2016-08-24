@@ -36,13 +36,16 @@ index.js
 public/index.html
 
 •	Renders a 3D model that can be controlled using serial data. 
-•	Imports the relevant JS modules and CSS styling used in the webpage. Runs a script to make a looping request to the server. 
+•	Imports the relevant JS modules and CSS styling used in the webpage.
+•	Runs a script to make a looping request to the server. 
 •	Makes a call to src/mesh_import_woman2.js
 
 public/src/mesh_import_woman2.js
 
 •	On startup, a woman’s 3D mesh is loaded, and the initial render, draw conditions (camera/light), and GUI control panel are enabled in the init() function. 
+
 •	The render() function is looped that constantly collects serial data through making requests to the server, which is used to alter the orientation of the shapes on the webpage. 
+
 
 Requirements
 
