@@ -1,10 +1,10 @@
 # romxz.github.io
 
-#Introduction
+##Introduction
 
 Our code creates a 3D render of a human bust which can be controlled using serial data (from Arduino) and a graphical user interface control panel. Features include: zoom in/out, lighting control, camera control. 
 
-#Definitions
+##Definitions
 
 •	Serial Communication and Serial Ports
 
@@ -26,16 +26,16 @@ Node.js is a runtime-environment for server-side Web applications. Most modules 
 
 Localhost is the standard hostname that is assigned to the computational device in use (always with IP address 127.0.0.1. )
 
-File Explanations
+##File Explanations
 
-index.js
+####index.js
 
 •	Initializes communication with the serial port and opens up a server. 
 
 •	Gets an analog reading from the serial port and writes it to a client.
 
 
-public/index.html
+####public/index.html
 
 •	Renders a 3D model that can be controlled using serial data. 
 
@@ -46,20 +46,20 @@ public/index.html
 •	Makes a call to src/mesh_import_woman2.
 
 
-public/src/mesh_import_woman2.js
+####public/src/mesh_import_woman2.js
 
 •	On startup, a woman’s 3D mesh is loaded, and the initial render, draw conditions (camera/light), and GUI control panel are enabled in the init() function. 
 
 •	The render() function is looped that constantly collects serial data through making requests to the server, which is used to alter the orientation of the shapes on the webpage. 
 
 
-Requirements
+##Requirements
 
 	- Arduino Software
 	- Node.js
 	- Web Browser
     
-Instructions
+##Instructions
 
 1.	Upload Arduino code that prints to serial. 
 2.	Change constants in public/index.html (delimiters, axes, etc. depending on your Arduino code)
