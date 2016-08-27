@@ -7,7 +7,7 @@ var camera, scene, renderer, cameraControls, effectController, gui;
 var clock = new THREE.Clock();
 var lights = [];
 var state = { restart: false };
-var Alice, Bob, Carl, Dan, Swag, Yolo2;
+var Alice, Bob, Carl, Dan, Swag, Yolo2, Box;
 var aliceRad = 5, bobRad = 5;
 var mInit = 200//10;
 var kInit = 100//10;
@@ -91,8 +91,8 @@ function init() {
     //Dan
     Dan = new THREE.Object3D();
     var danSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ff00} ));
-    Dan.m = mInit;
-    Dan.k = kInit;
+    Dan.m = 700;
+    Dan.k = 500;
     Dan.b = bInit;
     Dan.add(danSphere);
     Dan.position.x = -length_swag + 20;
@@ -105,10 +105,15 @@ function init() {
     Yolo2.position.x = length_yolo/2;
     scene.add(Yolo2);
     
-    Swag = new THREE.Mesh(new THREE.CylinderGeometry(aliceRad+1, aliceRad+1, length_swag , 32 ), new THREE.MeshBasicMaterial( {color: 0xffff00,  transparent: true, opacity: 0.5} ));
+    Swag = new THREE.Mesh(new THREE.CylinderGeometry(aliceRad+1, aliceRad+1, length_swag , 32 ), new THREE.MeshBasicMaterial( {color:  0x1CA949,  transparent: true, opacity: 0.75} ));
     Swag.rotateZ(Math.PI/2.0);
     Swag.position.x = Alice.position.x - length_swag/2;
     scene.add(Swag);
+              
+              
+    Box = new THREE.Mesh(new THREE.BoxGeometry(length_yolo + 2*Alice.position.x+length_swag, 2*aliceRad+5,  2*aliceRad+5 , 32 ), new THREE.MeshBasicMaterial( {color:0xffff00,  transparent: true, opacity: 0.25} ));
+    Box.position.x = (length_yolo + 2*Alice.position.x-length_swag)/2;
+    scene.add(Box);
 }
 
     
