@@ -58,11 +58,11 @@ function init() {
     }, false);
 
     // klein Map
-    klein = new THREE.Mesh(makeKlein(), new THREE.MeshBasicMaterial( {color: 0xff00ff, transparent: true, opacity: 0.7 }));
+    klein = new THREE.Mesh(makeKlein(), new THREE.MeshBasicMaterial( {vertexColors: THREE.VertexColors}));//, transparent: true, opacity: 0.8 }));
     klein.scale.set(kleinScale, kleinScale, kleinScale);
     //log('parametricgeometries["klien"]:');
     //log(THREE.ParametricGeometries['klein'](0,0));
-    klein.position.set(bobRad*7, 0, bobRad*7);
+    klein.position.set(bobRad*7, 0, bobRad*9);
     scene.add(klein);
     
 
@@ -70,8 +70,8 @@ function init() {
     BobMap = new THREE.Object3D();
     var bobMapSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad/5, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff} ));
     BobMap.add(bobMapSphere);
-    BobMap.uvPos = V2(0, 0);
-    BobMap.uvVel = V2(0.5, 0.1);
+    BobMap.uvPos = V2(0.5, 0.5);
+    BobMap.uvVel = V2(0.1, 0.13);
     var pos = kleinCoordinates(BobMap.uvPos.x,BobMap.uvPos.y,klein.position);
     //log('klein position:');
     //log(pos);
@@ -119,7 +119,9 @@ function init() {
     scene.add(Eve);
 
     // Plane
-    var plane = new THREE.Mesh( new THREE.PlaneGeometry( extentU, extentV, 32 ), new THREE.MeshBasicMaterial( {color: 0xfffff0, side: THREE.DoubleSide} ) );
+    var planeGeo = new THREE.PlaneGeometry( extentU, extentV, 32 );
+    planeGeo = colorPlane(planeGeo);
+    var plane = new THREE.Mesh( planeGeo, new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, side: THREE.DoubleSide} ));//{color: 0xfffff0, side: THREE.DoubleSide} ) );
     plane.position.x = extentU/2;
     plane.position.y = extentV/2;
     scene.add( plane );
