@@ -63,13 +63,27 @@ Localhost is the standard hostname that is assigned to the computational device 
 
 ####Node.js
 
+
 ####Arduino
+
 
 ####HTML/CSS
 
+
 ####General Web Development
 
+https://www.codecademy.com/learn/web - a basic tutorial to the syntax and general elements of HTML and CSS, and the relationship between the two languages. 
+
+https://www.codecademy.com/learn/javascript - a tutorial that teaches basic Javascript, which can later be used in conjunction with HTML and CSS to influence certain elements on the webpage. 
+
+https://www.codecademy.com/learn/jquery - a tutorial that teaches JQuery, a common Javascript library that makes it simple to create interactive websites that run functions on various event occurences. 
+
+http://www.w3schools.com/ - an online reference that outlines and demonstrates both basic and advanced techniques and scripts regarding web development, including HTML/CSS/Javascript, as well as various Javascript libraries and server-side development. 
+
+https://www.coursera.org/learn/html-css-javascript - an online course that teaches the basics of HTML/CSS and Javascript. 
+
 ####Others
+
     
 ##Instructions
 
