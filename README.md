@@ -69,9 +69,6 @@ Localhost is the standard hostname that is assigned to the computational device 
 
 ####HTML/CSS
 
-
-####General Web Development
-
 https://www.codecademy.com/learn/web - a basic tutorial to the syntax and general elements of HTML and CSS, and the relationship between the two languages. 
 
 https://www.codecademy.com/learn/javascript - a tutorial that teaches basic Javascript, which can later be used in conjunction with HTML and CSS to influence certain elements on the webpage. 
@@ -82,9 +79,18 @@ http://www.w3schools.com/ - an online reference that outlines and demonstrates b
 
 https://www.coursera.org/learn/html-css-javascript - an online course that teaches the basics of HTML/CSS and Javascript. 
 
+####General Web Development
+
+https://www.coursera.org/specializations/full-stack - a comprehensive online specialization consisting of 6 courses (5 of which can be obtained for free without the assignments). Covers HTML/CSS/JS, and moves into frameworks like AngularJS and running JS scripts using node.js, and finally covers server-side development using the express JS module and MongoDB. 
+
 ####Others
 
-    
+http://www.color-hex.com/ - an online reference for quickly finding HEX colour codes. 
+
+http://stackoverflow.com/ - an online forum where one can publicly answer and ask questions. 
+
+https://www.reddit.com/r/learnprogramming/ - another online forum for asking and answering questions. 
+
 ##Instructions
 
 1.	Upload Arduino code that prints to serial. 
