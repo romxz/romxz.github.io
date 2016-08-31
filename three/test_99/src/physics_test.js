@@ -9,13 +9,16 @@ var lights = [];
 var state = { restart: false };
 var Alice, Bob, Carl, Dan, Swag, Yolo2, Box;
 var aliceRad = 5, bobRad = 5;
+var sFactor = 4;
 var mInit = 200//10;
-var kInit = 100//10;
-var bInit = 0//20;
+var kInit = 100*sFactor*sFactor//10;
+var bInit = 300*sFactor//20;
 var c = 100;
 var maxDistance = 30;
 var VIEW_SCALE = 0.8;
-
+var forceDisplay;
+var forceScale = 10000;
+var forceLength = 30;
 
 function init() {
     var canvasWidth = window.innerWidth;
@@ -29,7 +32,7 @@ function init() {
     renderer.gammaInput = true;
     renderer.gammaOutput = true;
     renderer.setSize(VIEW_SCALE*canvasWidth, VIEW_SCALE*canvasHeight);
-    renderer.setClearColor(0xF0F8FF, 1.0);
+    renderer.setClearColor(0x80888F, 1.0);
     var container = document.getElementById('container');
     container.appendChild(renderer.domElement);
 
@@ -55,7 +58,7 @@ function init() {
 
     // Alice
     Alice = new THREE.Object3D();
-    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000} ));
+    var aliceSphere = new THREE.Mesh(new THREE.SphereGeometry( aliceRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x00ffff} ));
     Alice.m = mInit;
     Alice.k = kInit;
     Alice.b = bInit;
@@ -66,13 +69,24 @@ function init() {
 
     // Bob
     Bob = new THREE.Object3D();
-    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0x0000ff} ));
+    var bobSphere = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xffffff} ));
     Bob.m = mInit;
     Bob.k = kInit;
     Bob.b = bInit;
     Bob.add(bobSphere);
     Bob.velocity = V3(0,0,0);
     scene.add(Bob);
+    
+    // Bob2
+    var bobSphere2 = new THREE.Mesh(new THREE.SphereGeometry( bobRad, 32, 32 ), new THREE.MeshBasicMaterial( {color: 0xffffff} ));
+    bobSphere2.position.x = 70;
+    scene.add(bobSphere2);
+    
+    // Force display
+    forceDisplay = new THREE.Mesh(new THREE.CylinderGeometry(bobRad, bobRad, forceLength  , 32 ), new THREE.MeshBasicMaterial( {color: 0xff0000} ));
+    forceDisplay.position.y = 40;
+    forceDisplay.position.z = -50;
+    scene.add(forceDisplay);
     
     var length_yolo = 50;
     var length_swag = 100;
@@ -86,7 +100,7 @@ function init() {
     Carl.add(carlSphere);
     Carl.position.x = -length_swag ;
     Carl.velocity = V3(0,0,0);
-    scene.add(Carl);
+    //scene.add(Carl);
     
     //Dan
     Dan = new THREE.Object3D();
@@ -97,10 +111,10 @@ function init() {
     Dan.add(danSphere);
     Dan.position.x = -length_swag + 20;
     Dan.velocity = V3(5,5,5);
-    scene.add(Dan);
+    //scene.add(Dan);
     
     
-    Yolo2 = new THREE.Mesh(new THREE.CylinderGeometry(aliceRad+1, aliceRad+1, length_yolo + 2*Alice.position.x  , 32 ), new THREE.MeshBasicMaterial( {color: 0xff62f0,  transparent: true, opacity: 0.75} ));
+    Yolo2 = new THREE.Mesh(new THREE.CylinderGeometry(aliceRad+1, aliceRad+1, length_yolo + 2*Alice.position.x  , 32 ), new THREE.MeshBasicMaterial( {color: 0xff12f0,  transparent: true, opacity: 0.75} ));
     Yolo2.rotateZ(Math.PI/2.0);
     Yolo2.position.x = length_yolo/2;
     scene.add(Yolo2);
@@ -108,12 +122,12 @@ function init() {
     Swag = new THREE.Mesh(new THREE.CylinderGeometry(aliceRad+1, aliceRad+1, length_swag , 32 ), new THREE.MeshBasicMaterial( {color:  0x1CA949,  transparent: true, opacity: 0.75} ));
     Swag.rotateZ(Math.PI/2.0);
     Swag.position.x = Alice.position.x - length_swag/2;
-    scene.add(Swag);
+    //scene.add(Swag);
               
               
     Box = new THREE.Mesh(new THREE.BoxGeometry(length_yolo + 2*Alice.position.x+length_swag, 2*aliceRad+5,  2*aliceRad+5 , 32 ), new THREE.MeshBasicMaterial( {color:0xffff00,  transparent: true, opacity: 0.25} ));
     Box.position.x = (length_yolo + 2*Alice.position.x-length_swag)/2;
-    scene.add(Box);
+    //scene.add(Box);
 }
 
     
@@ -130,6 +144,8 @@ function render() {
         var currVelx = updateVelocity(Alice, Bob, delta);
         var currPosy = updatePosition(Dan, Carl, delta);
         var currVely = updateVelocity(Dan, Carl, delta);
+        forceDisplay.scale.y = updateForce(Alice, Bob, delta);
+        forceDisplay.position.y = 40 + forceLength/2*forceDisplay.scale.y;
         Alice.position.x = currPosx;
         Alice.velocity.x = currVelx;
         Dan.position.x = currPosy;
@@ -143,6 +159,7 @@ function render() {
         Swag.position.x = currPosx - length2/2; 
         Swag.scale.y = length2/100;
         
+        
     }
 }
 
@@ -154,6 +171,12 @@ function getC4(m, k, b, delta){ return -k*delta/m; }
 function getC5(m, k, b, delta){ return k*delta/m; }
 function getC6(m, k, b, delta){ return (1-b*delta/m); }
 function getC7(m, k, b, delta){ return b*delta/m; }
+
+function updateForce(p, q, delta){
+    var ppx = p.position.x, ppy = p.position.y, ppz = p.position.z;
+    var qqx = q.position.x, qqy = q.position.y, qqz = q.position.z;
+    return p.k*(ppx-qqx)/forceScale;
+}
 
 function updatePosition(p, q, delta){
     var c0 = getC0(p.m, p.k, p.b, delta);
