@@ -2,29 +2,29 @@
 
 ##Introduction
 
-Our code creates a 3D render of a human bust which can be controlled using serial data (from Arduino) and a graphical user interface control panel. Features include: zoom in/out, lighting control, camera control. 
+Our code creates a 3D render of a human bust which can be controlled using serial data (from Arduino) and a graphical user interface control panel. Features include: zoom in/out, lighting control, camera control. For example, this can be used to take motion input from an external sensor and use it as input to move a 3D model. 
 
 ##Definitions
 
 ####Serial Communication and Serial Ports
 
-Serial communication refers to the transportation process in which data is transferred one bit at a time sequentially. Serial ports are interfaces that allow for data transfer through serial communication, and have many important usages today in the fields of automation, scientific instrumentation, and commercial product development.
+Serial communication refers to the transportation process in which data is transferred one bit at a time sequentially. Serial ports are interfaces that allow for data transfer through serial communication, and have many important usages today in the fields of automation, scientific instrumentation, and commercial product development. In our case, the data from the sensor to control the 3D model is retrieved from the serial port of the computer. 
 
 ####Arduino
 
-Arduinos are microcontroller boards that have the ability to read digital/analog data, write digital/analog data, and communicate with a computer using serial communication with its serial port, among other functions. 
+Arduinos are microcontroller-embedded boards that have the ability to read digital/analog data, write digital/analog data, and communicate with a computer using serial communication with its serial port, among other functions. In our case, the Arduino is used as an hardware interface between the motion sensor and the serial port in order to provide the serial port data in a usable format. 
 
 ####HTTP/Request/Response/GET
 
-HTTP(Hypertext Transfer Protocol) allows for communication and data transfer between clients and servers. This communication occurs via a request-response protocol between a client and a server. GET is one system of this request-response protocol that requests data from the specified resource. 
+HTTP(Hypertext Transfer Protocol) allows for communication and data transfer between clients who request a resource/service and servers that provides a resource/service. This communication occurs via a request-response protocol between a client and a server. GET is one system of this request-response protocol that requests data from the specified resource. In our case, a request is made to the serial port data and the response is relayed to a server. The webpage retrieves data from this server via a GET request to display on screen.  
 
 ####Node.js/ Express.js
 
-Node.js is a runtime-environment for server-side Web applications. Most modules are developed in the Javascript language, and events are run in asynchronous I/O.  Express.js is a web framework application for Node.js that is the general standard for developing server-based applications. 
+Node.js is a runtime-environment for server-side Web applications. Most modules are developed in the Javascript language, and events are run in asynchronous I/O.  Express.js is a web framework application for Node.js that is the general standard for developing server-based applications. In our case, we use node.js to run the javascript code (that calls express.js) that initializes and maintains the server for data storage after being retrieved from the serialport. 
 
 ####Localhost
 
-Localhost is the standard hostname that is assigned to the computational device in use (always with IP address 127.0.0.1. )
+Localhost is the standard hostname that is assigned to the computational device in use (always with IP address 127.0.0.1.). In our case, after running the javascript code that starts the server, the serial data can be visualized on the localhost. 
 
 ##File Explanations
 
@@ -55,8 +55,10 @@ Localhost is the standard hostname that is assigned to the computational device 
 
 ##Requirements
 
+	- Sensor
+	- Computer
 	- Arduino Software
-	- Node.js
+	- Node.js (and npm)
 	- Web Browser
 
 ##Additional Learning Resources
