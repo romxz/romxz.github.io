@@ -105,7 +105,7 @@ http://stackoverflow.com/ - an online forum where one can publicly answer and as
 
 https://www.reddit.com/r/learnprogramming/ - another online forum for asking and answering questions.
 
-https://ngrok.com/download - a website that allows you to put your localhost on the web for public viewing (not sure how safe this is)
+https://ngrok.com/- a program that allows you to put your localhost on the web for public viewing (not sure how safe this is)
 
 ##Instructions
 
