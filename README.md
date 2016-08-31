@@ -66,6 +66,13 @@ Localhost is the standard hostname that is assigned to the computational device 
 
 ####Arduino
 
+https://www.amazon.ca/Arduino-Starter-Official-170-page-Projects/dp/B009UKZV0A - a starter kit one can purchase to get started with Arduino, includes various electronics devices and a book with 15 projects in increasing difficulty. 
+
+https://www.arduino.cc/en/Tutorial/HomePage - the official Arduino website for tutorials and references. 
+
+https://learn.adafruit.com/category/learn-arduino - offers a plethora of examples for the user's viewing pleasure. 
+
+http://forefront.io/a/beginners-guide-to-arduino/ - a tutorial to absolute beginners wanting to learn Arduino. 
 
 ####HTML/CSS
 
