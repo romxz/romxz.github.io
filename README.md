@@ -63,6 +63,11 @@ Localhost is the standard hostname that is assigned to the computational device 
 
 ####Node.js
 
+http://nodeschool.io/ - workshops for getting started with node.js
+
+http://www.tutorialspoint.com/nodejs/ - various tutorials to allow one to learn about node.js. I prefer to use this website as a reference rather than a learning tool. 
+
+https://www.coursera.org/learn/server-side-development - an online course about server-side web development using node.js
 
 ####Arduino
 
