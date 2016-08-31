@@ -12,19 +12,19 @@ Serial communication refers to the transportation process in which data is trans
 
 ####Arduino
 
-Arduinos are microcontroller-embedded boards that have the ability to read digital/analog data, write digital/analog data, and communicate with a computer using serial communication with its serial port, among other functions. In our case, the Arduino is used as an hardware interface between the motion sensor and the serial port in order to provide the serial port data in a usable format. 
+Arduinos are microcontroller-embedded boards that have the ability to read digital/analog data, write digital/analog data, and communicate with a computer using serial communication with its serial port, among other functions. In our case, the Arduino is used as a hardware interface between the motion sensor and the serial port in order to provide the serial port data in a usable format. 
 
 ####HTTP/Request/Response/GET
 
-HTTP(Hypertext Transfer Protocol) allows for communication and data transfer between clients who request a resource/service and servers that provides a resource/service. This communication occurs via a request-response protocol between a client and a server. GET is one system of this request-response protocol that requests data from the specified resource. In our case, a request is made to the serial port data and the response is relayed to a server. The webpage retrieves data from this server via a GET request to display on screen.  
+HTTP(Hypertext Transfer Protocol) allows for communication and data transfer between clients who request a resource/service and servers that provides a resource/service. This communication occurs via a request-response protocol between a client and a server. GET is one system of this request-response protocol that requests data from the specified resource. In our case, a request is made to the serial port to obtain data and the response is relayed to a server. The webpage retrieves data from this server via a GET request to display on screen.  
 
 ####Node.js/ Express.js
 
-Node.js is a runtime-environment for server-side Web applications. Most modules are developed in the Javascript language, and events are run in asynchronous I/O.  Express.js is a web framework application for Node.js that is the general standard for developing server-based applications. In our case, we use node.js to run the javascript code (that calls express.js) that initializes and maintains the server for data storage after being retrieved from the serialport. 
+Node.js is a runtime-environment for server-side Web applications. Most modules are developed in the Javascript language, and events are run in asynchronous I/O.  Express.js is a web framework application for Node.js that is the general standard for developing server-based applications. In our case, we use node.js to run the javascript code (that calls express.js) that initializes and maintains the server for data storage after being retrieved from the serial port. 
 
 ####Localhost
 
-Localhost is the standard hostname that is assigned to the computational device in use (always with IP address 127.0.0.1.). In our case, after running the javascript code that starts the server, the serial data can be visualized on the localhost. 
+Localhost is the standard hostname that is assigned to the computational device in use (always with IP address 127.0.0.1.). It runs on a local server that is generally used as a local testing environment for web applications. In our case, after running the javascript code that starts the server, the serial data can be visualized on the localhost for testing. 
 
 ##File Explanations
 
@@ -41,25 +41,25 @@ Localhost is the standard hostname that is assigned to the computational device 
 
 •	Imports the relevant JS modules and CSS styling used in the webpage.
 
-•	Runs a script to make a looping request to the server. 
+•	Runs a script with looping request of the sersor data from the server. 
 
-•	Makes a call to src/mesh_import_woman2.
+•	Makes a call to src/mesh_import_woman2 which loads the 3D model using the three.js javascript library.
 
 
 ####public/src/mesh_import_woman2.js
 
-•	On startup, a woman’s 3D mesh is loaded, and the initial render, draw conditions (camera/light), and GUI control panel are enabled in the init() function. 
+•	Using the three.js library, on startup, a woman’s 3D mesh is loaded from a .dae file, and the initial render, draw conditions (camera/light), and graphical user interface control panel are enabled in the init() function. 
 
-•	The render() function is looped that constantly collects serial data through making requests to the server, which is used to alter the orientation of the shapes on the webpage. 
+•	The render() function is constantly looped, which constantly collects serial data by making requests to the server (the incoming data is used to alter the orientation of the human model), and then renders the changes to the 3D model on the screen.
 
 
-##Requirements
+##Testing Environment and Hardware
 
-	- Sensor
-	- Computer
-	- Arduino Software
-	- Node.js (and npm)
-	- Web Browser
+	- Tested on Windows 10 and 8.1
+	- (Motion) Sensor (or some other input to the Arduino)
+	- Arduino Hardware/Software (eg Arduino Uno and the Arduino Software IDE)
+	- node.js (and npm)
+	- Tested on Chrome web browser
 
 ##Additional Learning Resources
 
@@ -79,11 +79,11 @@ https://www.amazon.ca/Arduino-Starter-Official-170-page-Projects/dp/B009UKZV0A -
 
 https://www.arduino.cc/en/Tutorial/HomePage - the official Arduino website for tutorials and references. 
 
-https://learn.adafruit.com/category/learn-arduino - offers a plethora of examples for the user's viewing pleasure. 
+https://learn.adafruit.com/category/learn-arduino - offers a plethora of Arduino examples.
 
-http://forefront.io/a/beginners-guide-to-arduino/ - a tutorial to absolute beginners wanting to learn Arduino. 
+http://forefront.io/a/beginners-guide-to-arduino/ - a tutorial for absolute beginners wanting to learn Arduino. 
 
-####HTML/CSS
+####HTML/CSS/Javascript
 
 https://www.codecademy.com/learn/web - a basic tutorial to the syntax and general elements of HTML and CSS, and the relationship between the two languages. 
 
@@ -101,15 +101,9 @@ https://www.coursera.org/specializations/full-stack - a comprehensive online spe
 
 ####Others
 
-http://www.color-hex.com/ - an online reference for quickly finding HEX colour codes. 
-
-http://stackoverflow.com/ - an online forum where one can publicly answer and ask questions. 
-
-https://www.reddit.com/r/learnprogramming/ - another online forum for asking and answering questions.
-
 https://ngrok.com/- a program that allows you to put your localhost on the web for public viewing (not sure how safe this is)
 
-##Instructions
+##Quick Start Guide
 
 1.	Upload Arduino code that prints to serial. 
 2.	Change constants in public/index.html (delimiters, axes, etc. depending on your Arduino code)
