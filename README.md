@@ -58,6 +58,18 @@ Localhost is the standard hostname that is assigned to the computational device 
 	- Arduino Software
 	- Node.js
 	- Web Browser
+
+##Additional Learning Resources
+
+####Node.js
+
+####Arduino
+
+####HTML/CSS
+
+####General Web Development
+
+####Others
     
 ##Instructions
 
