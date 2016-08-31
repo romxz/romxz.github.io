@@ -67,7 +67,9 @@ http://nodeschool.io/ - workshops for getting started with node.js
 
 http://www.tutorialspoint.com/nodejs/ - various tutorials to allow one to learn about node.js. I prefer to use this website as a reference rather than a learning tool. 
 
-https://www.coursera.org/learn/server-side-development - an online course about server-side web development using node.js
+https://www.coursera.org/learn/server-side-development - an online course about server-side web development using node.js. 
+
+https://github.com/tigoe/NodeExamples - various projects involving node.js for visual learners that learn better from looking at code. I derived from the Serial-to-Browser project in developing the code in this project. 
 
 ####Arduino
 
@@ -101,7 +103,9 @@ http://www.color-hex.com/ - an online reference for quickly finding HEX colour c
 
 http://stackoverflow.com/ - an online forum where one can publicly answer and ask questions. 
 
-https://www.reddit.com/r/learnprogramming/ - another online forum for asking and answering questions. 
+https://www.reddit.com/r/learnprogramming/ - another online forum for asking and answering questions.
+
+https://ngrok.com/download - a website that allows you to put your localhost on the web for public viewing (not sure how safe this is)
 
 ##Instructions
 
