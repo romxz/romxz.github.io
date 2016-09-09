@@ -3,6 +3,9 @@
     <head>
         <meta charset="utf-8">
         <title> Import Collada Test</title>
+        <!-- 
+        The "_nodevice" suffix on the name of this file just means that the part of the code that used the serial input (e.g. to read from an arduino) has been commented out. This just leaves the 3D model JS applet that can be rotated/moved with the mouse/gui controls.
+        -->
         <style>
             body {
                 background-color: #F5F5F5;
@@ -18,16 +21,20 @@
         </style>
         <script src="lib/jquery-1.8.3.min.js"></script>
         <script type="text/javascript" src="./build/three.js"></script>
+        <!-- Note: instead of including three.js above, can use this when uploading to web to save space:
+        <script type="text/javascript" src="./build/three.min.js"></script> -->
         <script type="text/javascript" src="./loaders/ColladaLoader.js"></script>
         <div id ="webGL-container"></div>        
-        <!--<div id="web-GL container"></div>-->
         <div id="container"></div>
         <script type="text/javascript" src="./examples/js/libs/dat.gui.min.js"></script>
         <script type="text/javascript" src="./examples/js/controls/OrbitControls.js"></script>
         <script type="text/javascript" src="./src/Stats.js"></script>
         <script type="text/javascript" src="extras/lodash.core.js"></script>
+        <!-- 
+        The "_nodevice" suffix on the name of the mesh file below just means that the part of the code that used the serial input (e.g. to read from an arduino) has been commented out. This just leaves the 3D model JS three.js applet that can be rotated/moved with the mouse/gui controls.
+        -->
         <script type="text/javascript" src='src/mesh_import_woman2_nodevice.js'></script>
-        <!-- Uncomment when device connected
+        <!-- Uncomment when Arduino device/etc on serial is connected, assuming your browser supports the node.js dependencies
         <script type="text/javascript" src='src/mesh_import_woman2.js'></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.3.16/p5.min.js"></script>
         <!--<script type = "text/javascript" src="jquery.js"></script> -->
@@ -56,7 +63,5 @@
     </head>
     <body>
         <div id="visualization" style="width: 900px; height: 500px"></div>
-        <!-- use when uploading to web:
-<script type="text/javascript" src="./build/three.min.js"></script> -->
     </body>
 </html>

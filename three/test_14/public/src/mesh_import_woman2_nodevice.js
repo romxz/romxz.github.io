@@ -21,16 +21,18 @@ $(function(){
     /* Sometimes, programs where you import meshes from (e.g. like blender) have different sense of what is "up".
     convertUpAxis is in case the dae needs this fixup */
     loader.options.convertUpAxis = false;
+    // path to textures (needs to be changed when running locally without a localhost server)
+    var localPath = './json';
     // texture path locations for some parts of the woman model:
     var textMaps = {
-        'woman_02-ponytail01': './json/textures/ponytail01_diffuse.png'
-        , 'woman_02-highpolyeyes': './json/textures/brown_eye.png'
-        , 'woman_02-eyebrow010': './json/textures/eyebrow010.png'
-        , 'woman_02-eyelashes02': './json/textures/eyelashes02.png'
-        , 'woman_02-female_casualsuit01': './json/textures/female_casualsuit01_diffuse.png'
+        'woman_02-ponytail01': localPath+'/textures/ponytail01_diffuse.png' //'woman_02-ponytail01': './json/textures/ponytail01_diffuse.png'
+        , 'woman_02-highpolyeyes': localPath+'/textures/brown_eye.png'
+        , 'woman_02-eyebrow010': localPath+'/textures/eyebrow010.png'
+        , 'woman_02-eyelashes02': localPath+'/textures/eyelashes02.png'
+        , 'woman_02-female_casualsuit01': localPath+'/textures/female_casualsuit01_diffuse.png'
     }
     /* To load the dae, you pass to the loader the file path, as well as a function indicating what to do with the file once it loads it */
-    loader.load('./json/woman_bust4.dae', function (collada){
+    loader.load(localPath+'/woman_bust4.dae', function (collada){
         // The location of the objects imported are structured hierarchically, starting with the scene object at the top 
         dae = collada.scene;
         // Sometimes the objects imported might look too small or large, depending on the units used
@@ -223,7 +225,7 @@ $(function(){
         $("#webGL-container").append( stats.domElement );		
     }
 
-    /* Uncomment when using device
+    /* Uncomment when using Arduino device
     // Function used to get the device input data, located in the /device/ path
     function getData(channel) {
         httpGet('/device/' + channel, update);
